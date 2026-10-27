@@ -166,6 +166,8 @@ html[lang='ja'] :is(h1, h2, h3, .band__line, .hero__lead) { word-break: auto-phr
   transition: transform 0.5s var(--ease);
 }
 @media (hover: hover) { .nav__list a:hover::after { transform: scaleX(1); transform-origin: left; } }
+.nav__list a[aria-current='page']::after { transform: scaleX(1); }
+.footer__links a[aria-current='page'] { color: var(--saffron); }
 .nav__book { display: none; }
 
 .site-header__actions { display: flex; align-items: center; gap: 0.9rem; }
@@ -275,16 +277,86 @@ html[lang='ja'] .hero__role p:first-child { font-family: var(--f-mincho); letter
 .hero__cta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2rem; }
 .hero__note { margin-top: 1.4rem; font-size: 0.78rem; letter-spacing: 0.16em; color: var(--ink-2); }
 
-.hero__photo { position: relative; justify-self: center; width: min(100%, 460px); }
-.hero__photo::before {
-  content: ''; position: absolute; inset: 18px -18px -18px 18px; z-index: -1;
-  border: 1px solid var(--gold);
+.hero__photo { justify-self: center; width: min(100%, 440px); }
+
+/* Sub-pages reuse the hero, with a smaller title in place of the big "Mai". */
+.hero--page { min-height: min(100svh, 1000px); }
+.hero__title {
+  margin: clamp(1.2rem, 3vh, 2rem) 0 0;
+  font-family: var(--f-serif); font-weight: 300;
+  font-size: clamp(3rem, 6.6vw, 6rem); line-height: 1.02; letter-spacing: -0.02em;
 }
-.hero__photo figcaption, .award__video figcaption {
-  margin-top: 1.4rem; font-size: 0.72rem; letter-spacing: 0.16em; color: var(--ink-2); text-transform: uppercase;
+html[lang='ja'] .hero__title { font-family: var(--f-mincho); font-weight: 500; font-size: clamp(2.3rem, 4.8vw, 4.3rem); line-height: 1.35; letter-spacing: 0.04em; }
+.hero--page .hero__lead { margin-top: 1.4rem; }
+.hero--page .pills { margin-top: 1.6rem; }
+
+/* ---------- Floating glass card ----------
+   Her photo on a pane of frosted glass, hanging in 3D: the photo floats in front of
+   the glass and the caption chip floats in front of the photo. motion.js adds the
+   float and the pointer tilt; the resting angle here is for reduced motion and no JS. */
+.float-card { position: relative; perspective: 1500px; }
+.float-card__body {
+  --px: 0; --py: 0;
+  position: relative; padding: 14px;
+  transform-style: preserve-3d;
+  transform: rotateX(4deg) rotateY(-9deg);
+}
+@media (prefers-reduced-motion: no-preference) { .js .float-card__body { transform: none; } }
+.float-card__glass {
+  position: absolute; inset: 0; border-radius: 34px;
+  background: linear-gradient(150deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.16) 38%, rgb(255 248 236 / 0.08) 62%, rgb(255 255 255 / 0.36));
+  border: 1px solid rgb(255 255 255 / 0.62);
+  box-shadow:
+    inset 0 1px 1px rgb(255 255 255 / 0.85),
+    inset 0 -18px 30px -22px rgb(142 79 37 / 0.35),
+    calc(var(--px) * -26px) calc(56px - var(--py) * 18px) 90px -36px rgb(42 28 19 / 0.5),
+    0 22px 40px -26px rgb(142 79 37 / 0.45);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
+}
+.float-card__frame {
+  border-radius: 22px;
+  translate: 0 0 34px;
+  isolation: isolate;
+  box-shadow: 0 16px 34px -18px rgb(42 28 19 / 0.55);
+}
+.float-card--tall .float-card__frame { aspect-ratio: 9 / 16; }
+.float-card__sheen {
+  position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background:
+    radial-gradient(90% 60% at calc(28% + var(--px) * 30%) calc(8% + var(--py) * 22%), rgb(255 255 255 / 0.34), transparent 60%),
+    linear-gradient(to top, rgb(26 17 10 / 0.3), transparent 34%);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.3);
+}
+.float-card__caption {
+  position: absolute; left: -1.5rem; bottom: 2.2rem;
+  translate: 0 0 72px;
+  display: flex; align-items: center; gap: 0.8rem;
+  max-width: calc(100% - 0.5rem);
+  padding: 0.7rem 1.15rem 0.7rem 0.7rem;
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgb(250 246 239 / 0.92), rgb(243 236 224 / 0.8));
+  border: 1px solid rgb(255 255 255 / 0.75);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 24px 40px -20px rgb(42 28 19 / 0.5);
+  -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
+  color: var(--ink); line-height: 1.3;
+}
+.float-card__mark {
+  flex: none; display: grid; place-items: center;
+  width: 2.2rem; height: 2.2rem; border-radius: 50%;
+  background: var(--saffron); color: var(--ink); font-size: 0.8rem;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 4px 10px -4px rgb(185 116 10 / 0.7);
+}
+.float-card__title { display: block; font-family: var(--f-serif); font-size: 1.12rem; font-weight: 500; letter-spacing: 0.005em; }
+html[lang='ja'] .float-card__title [data-l='ja'] { font-family: var(--f-mincho); font-size: 0.92em; letter-spacing: 0.06em; }
+.float-card__sub { display: block; margin-top: 0.15rem; font-size: 0.78rem; letter-spacing: 0.05em; color: var(--ink-2); }
+@media (max-width: 759px) {
+  .float-card__caption { left: -0.9rem; bottom: 1.4rem; padding: 0.6rem 0.95rem 0.6rem 0.6rem; }
+  .float-card__title { font-size: 1rem; }
 }
 
-.frame { position: relative; overflow: hidden; aspect-ratio: 2 / 3; background: var(--linen-2); }
+.frame { position: relative; overflow: hidden; aspect-ratio: 2 / 3; background: var(--linen-2); border-radius: 26px; }
 .frame img { width: 100%; height: 100%; object-fit: cover; }
 /* Taller than the frame so the scroll parallax never shows an edge. */
 .frame--parallax img { position: absolute; left: 0; top: -10%; height: 120%; }
@@ -310,19 +382,40 @@ html[lang='ja'] .hero__role p:first-child { font-family: var(--f-mincho); letter
 @keyframes scroll-line { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(100%); } }
 @media (min-width: 760px) and (min-height: 700px) { .hero__scroll { display: inline-flex; } }
 
+/* Phones first: the glass card (or the map) comes straight after the name, so the
+   first screen is the name, her photo in 3D and the cloth; the words follow. */
 @media (max-width: 759px) {
-  .hero { min-height: auto; }
-  .hero__photo { width: min(86%, 400px); }
-  /* Phones: the cloth only falls behind the photo, never behind the text. */
+  .hero { min-height: auto; padding-top: calc(var(--header-h) + 1.2rem); }
+  .hero__grid { gap: 0; }
+  .hero__text { display: contents; }
+  .hero__text > * { justify-self: start; }
+  .hero .eyebrow { order: 1; }
+  .hero__name, .hero__title { order: 2; }
+  .hero__photo, .hero .map-panel { order: 3; justify-self: center; margin: 0.6rem 0 2.8rem; }
+  .hero__role { order: 4; }
+  .hero__lead { order: 5; }
+  .hero .pills { order: 6; }
+  .hero__cta { order: 7; }
+  .hero__note { order: 8; }
+  .hero__name { margin-bottom: 0.4rem; }
+  .hero__title { margin-bottom: 1.2rem; }
+  .hero--page .hero__lead { margin-top: 0; }
+  .hero__photo { width: min(84%, 400px); }
+  .hero .map-panel { width: 100%; }
+  /* The cloth hangs behind the card, fading out before the words. */
   .hero__cloth {
-    inset: auto 0 0; height: min(58%, 860px);
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%);
-    mask-image: linear-gradient(to bottom, transparent, #000 22%);
+    inset: 12rem 0 auto; height: 34rem;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 66%, transparent 94%);
+    mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 66%, transparent 94%);
   }
 }
 
+/* Visit: the map stands in for the photo. */
+.hero--map { min-height: auto; }
+@media (min-width: 760px) { .hero--map .hero__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); } }
+
 /* Hidden until the intro animation takes over (see motion.js). */
-.js:not(.ready) :is([data-intro], [data-intro-name], [data-intro-photo]) { opacity: 0; }
+.js:not(.ready) :is([data-intro], [data-intro-name], [data-intro-photo], [data-map-panel]) { opacity: 0; }
 
 /* ---------- Sash ---------- */
 .sash {
@@ -341,6 +434,9 @@ html[lang='ja'] .hero__role p:first-child { font-family: var(--f-mincho); letter
 .sash::before { top: 5px; }
 .sash::after { bottom: 5px; }
 .sash__track { display: flex; width: max-content; will-change: transform; }
+/* sash.js: grab it and fling it; vertical swipes still scroll the page. */
+.sash[data-ribbon] { cursor: grab; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; }
+.sash.is-grabbed { cursor: grabbing; }
 .sash__set {
   display: flex; align-items: center; gap: clamp(1.1rem, 2.4vw, 2rem); padding-right: clamp(1.1rem, 2.4vw, 2rem);
   white-space: nowrap;
@@ -394,21 +490,19 @@ html[lang='ja'] .h2--xl { font-size: clamp(2.2rem, 5vw, 4.2rem); line-height: 1.
 .facts dt { font-size: 0.74rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-3); padding-top: 0.2rem; }
 .facts dd { font-size: 0.95rem; }
 
-.award__video { position: relative; justify-self: center; }
-.award__video::before {
-  content: ''; position: absolute; inset: -18px 18px 18px -18px; z-index: -1;
-  border: 1px solid var(--gold);
-}
-.award__video { isolation: isolate; }
+.award__video { position: relative; justify-self: center; isolation: isolate; scroll-margin-top: calc(var(--header-h) + 1.5rem); }
 .video-frame {
   position: relative;
   height: min(76svh, 680px);
   aspect-ratio: 9 / 16;
   max-width: 100%;
   overflow: hidden;
+  border-radius: 30px;
   background: #1c130d;
-  box-shadow: 0 40px 70px -40px rgb(42 28 19 / 0.55);
+  box-shadow: 0 0 0 10px rgb(255 255 255 / 0.4), 0 0 0 11px rgb(255 255 255 / 0.7), 0 50px 80px -40px rgb(42 28 19 / 0.6);
 }
+.award__video .glass-chip { position: absolute; right: -1.2rem; top: 1.6rem; max-width: 15rem; }
+@media (max-width: 899px) { .award__video .glass-chip { right: -0.6rem; } }
 .video-frame video { width: 100%; height: 100%; object-fit: cover; }
 @media (max-width: 899px) { .video-frame { height: auto; width: min(100%, 380px); } }
 
@@ -484,6 +578,7 @@ html[lang='ja'] .band__line { font-family: var(--f-mincho); font-weight: 500; fo
   position: relative; overflow: hidden; isolation: isolate;
   aspect-ratio: 4 / 5; width: min(100%, 520px);
   display: grid; place-items: center;
+  border-radius: 30px;
   background: radial-gradient(120% 90% at 50% 110%, #4a2a12, #2a1c13 60%, #1d130c);
   color: var(--paper);
 }
@@ -532,8 +627,6 @@ html[lang='ja'] .treatment__meaning { font-family: var(--f-mincho); font-style: 
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.4rem 2rem;
   margin-top: clamp(1rem, 3vw, 2rem);
   padding: clamp(1.4rem, 3vw, 2rem) clamp(1.4rem, 3vw, 2.4rem);
-  border: 1px solid var(--gold);
-  background: rgb(250 246 239 / 0.55);
 }
 .menu-note p { max-width: 34rem; font-family: var(--f-serif); font-size: 1.3rem; line-height: 1.4; }
 html[lang='ja'] .menu-note p { font-family: var(--f-mincho); font-size: 1.05rem; line-height: 1.8; }
@@ -552,7 +645,7 @@ html[lang='ja'] .menu-note p { font-family: var(--f-mincho); font-size: 1.05rem;
 .dogs {
   display: grid; grid-template-columns: auto 1fr; gap: 1rem; align-items: start;
   margin-top: 2rem; padding: 1.2rem 1.3rem;
-  background: var(--linen); border-radius: 3px;
+  background: var(--linen); border-radius: 18px;
   font-size: 0.92rem; color: var(--ink-2);
 }
 .dogs__paw { width: 26px; height: 26px; fill: var(--saffron-deep); margin-top: 0.15rem; }
@@ -567,20 +660,50 @@ html[lang='ja'] .menu-note p { font-family: var(--f-mincho); font-size: 1.05rem;
 
 .visit__cta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2.4rem; }
 
+/* Visit map: a rounded glass panel like the AusMC venue map. */
+.map-panel { position: relative; padding: 10px; border-radius: 36px; }
 .map {
   position: relative;
-  height: min(76svh, 640px);
+  height: min(72svh, 680px);
   min-height: 360px;
-  background: var(--linen-2);
-  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.45) 50%, transparent 70%) 0 0 / 250% 100%,
+    var(--linen-2);
+  animation: map-wait 1.8s linear infinite;
   overflow: hidden;
+  isolation: isolate;
 }
-@media (max-width: 959px) { .map { height: 380px; } }
+@keyframes map-wait { to { background-position: -250% 0, 0 0; } }
+.map.is-ready, .map.is-fallback { animation: none; background: #020309; }
+.map.is-fallback { background: var(--linen-2); }
+/* Space behind the globe (map.js paints it), drifting very slowly. */
+.map-space {
+  position: absolute; left: -30%; top: -30%; width: 160%; height: 160%; max-width: none;
+  pointer-events: none;
+  animation: space-drift 480s linear infinite;
+}
+@keyframes space-drift { to { rotate: 360deg; } }
+@media (max-width: 759px) { .map { height: 420px; } }
 .map__fallback {
-  position: absolute; inset: 0; display: grid; place-items: center;
+  position: absolute; inset: 0; display: none; place-items: center;
   font-family: var(--f-serif); font-size: 1.3rem; text-decoration: underline; text-underline-offset: 6px;
 }
-.map.is-ready .map__fallback { display: none; }
+.map.is-fallback .map__fallback { display: grid; }
+.map-panel__chip { position: absolute; left: -1rem; bottom: 2.4rem; z-index: 2; pointer-events: none; }
+@media (max-width: 759px) { .map-panel__chip { left: -0.5rem; bottom: 1.6rem; } }
+.map-replay {
+  position: absolute; left: 50%; top: 14px; z-index: 2; translate: -50% 0;
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  min-height: 36px; padding: 0.4rem 0.9rem;
+  border: 1px solid rgb(255 255 255 / 0.75); border-radius: 999px; cursor: pointer;
+  background: rgb(250 246 239 / 0.82);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  box-shadow: 0 8px 18px -10px rgb(42 28 19 / 0.45);
+  font-size: 0.8rem; letter-spacing: 0.04em; color: var(--ink);
+  transition: background-color 0.3s;
+}
+.map-replay:hover { background: var(--saffron); }
 .map .maplibregl-ctrl-attrib { font-size: 10px; background: rgb(250 246 239 / 0.8); }
 .map .maplibregl-ctrl-group { border-radius: 999px; overflow: hidden; box-shadow: 0 6px 16px -8px rgb(42 28 19 / 0.4); }
 .map .maplibregl-cooperative-gesture-screen { font-family: var(--f-sans); background: rgb(42 28 19 / 0.55); }
@@ -599,10 +722,182 @@ html[lang='ja'] .menu-note p { font-family: var(--f-mincho); font-size: 1.05rem;
 @keyframes pin-pulse { 0% { transform: scale(1); opacity: 0.9; } 100% { transform: scale(3.2); opacity: 0; } }
 .map-pin__label {
   position: absolute; bottom: calc(100% + 10px); left: 50%; translate: -50% 0;
-  padding: 0.4rem 0.8rem; border-radius: 999px;
-  background: var(--ink); color: var(--paper);
+  padding: 0.4rem 0.85rem; border-radius: 999px;
+  background: rgb(42 28 19 / 0.82); color: var(--paper);
+  border: 1px solid rgb(255 255 255 / 0.25);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  box-shadow: 0 8px 18px -8px rgb(42 28 19 / 0.6);
   font-family: var(--f-serif); font-size: 0.95rem; white-space: nowrap; line-height: 1.2;
 }
+
+/* ---------- Glass ---------- */
+.glass-panel {
+  border-radius: 30px;
+  background: linear-gradient(150deg, rgb(255 255 255 / 0.66), rgb(250 246 239 / 0.42));
+  border: 1px solid rgb(255 255 255 / 0.7);
+  box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.9), 0 40px 70px -46px rgb(42 28 19 / 0.5), 0 14px 30px -24px rgb(142 79 37 / 0.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.4);
+  backdrop-filter: blur(18px) saturate(1.4);
+}
+.glass-chip {
+  display: grid; gap: 0.15rem;
+  padding: 0.75rem 1.1rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgb(250 246 239 / 0.92), rgb(243 236 224 / 0.8));
+  border: 1px solid rgb(255 255 255 / 0.75);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 22px 38px -20px rgb(42 28 19 / 0.5);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  backdrop-filter: blur(14px) saturate(1.4);
+  line-height: 1.3; color: var(--ink);
+}
+.glass-chip__title { font-family: var(--f-serif); font-size: 1.05rem; font-weight: 500; }
+.glass-chip__sub { font-size: 0.78rem; letter-spacing: 0.05em; color: var(--ink-2); }
+
+/* ---------- Links to the dedicated pages ---------- */
+.more {
+  display: inline-flex; align-items: center; gap: 0.9rem;
+  margin-top: 2.2rem;
+  font-family: var(--f-serif); font-size: 1.3rem; line-height: 1.2;
+}
+html[lang='ja'] .more { font-family: var(--f-mincho); font-size: 1.02rem; letter-spacing: 0.06em; }
+.more__arrow {
+  display: grid; place-items: center; flex: none;
+  width: 2.9rem; height: 2.9rem; border-radius: 50%;
+  border: 1px solid rgb(42 28 19 / 0.3);
+  transition: background-color 0.45s var(--ease), border-color 0.45s var(--ease), transform 0.45s var(--ease);
+}
+@media (hover: hover) {
+  .more:hover .more__arrow { background: var(--saffron); border-color: var(--saffron); transform: translateX(4px); }
+}
+
+.section-head--split { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1.5rem 3rem; }
+.section-head--split .more { margin-top: 0; }
+
+/* Home: the award film as a glass poster that opens the Award page. */
+.poster-link {
+  position: relative; display: block; justify-self: center;
+  width: min(100%, 340px); aspect-ratio: 9 / 16;
+  border-radius: 30px; overflow: hidden; isolation: isolate;
+  box-shadow: 0 0 0 10px rgb(255 255 255 / 0.4), 0 0 0 11px rgb(255 255 255 / 0.7), 0 50px 80px -40px rgb(42 28 19 / 0.6);
+}
+.poster-link img { width: 100%; height: 100%; object-fit: cover; transition: transform 1.2s var(--ease); }
+.poster-link::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgb(26 17 10 / 0.55), transparent 45%); }
+.poster-link__play {
+  position: absolute; left: 50%; top: 44%; z-index: 1; translate: -50% -50%;
+  display: grid; place-items: center; width: 4.6rem; height: 4.6rem; border-radius: 50%;
+  background: rgb(250 246 239 / 0.35); border: 1px solid rgb(255 255 255 / 0.7);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  transition: background-color 0.4s, transform 0.6s var(--ease);
+}
+.poster-link__play svg { width: 1.5rem; height: 1.5rem; fill: var(--paper); translate: 2px 0; }
+.poster-link__label { position: absolute; left: 1rem; right: 1rem; bottom: 1rem; z-index: 1; }
+.poster-link__label { display: grid; gap: 0.15rem; padding: 0.75rem 1rem; border-radius: 18px; background: rgb(250 246 239 / 0.9); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); color: var(--ink); font-size: 0.92rem; line-height: 1.35; }
+.poster-link__kicker { font-size: 0.7rem; letter-spacing: 0.2em; color: var(--saffron-deep); }
+@media (hover: hover) {
+  .poster-link:hover img { transform: scale(1.04); }
+  .poster-link:hover .poster-link__play { background: var(--saffron); transform: scale(1.06); }
+}
+
+/* Home: treatment cards that open the Treatments page. */
+.teasers { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); }
+@media (min-width: 900px) { .teasers { grid-template-columns: 1fr 1fr; } }
+.teaser {
+  display: grid; grid-template-rows: auto 1fr;
+  border-radius: 32px; overflow: hidden; isolation: isolate;
+  background: var(--paper);
+  border: 1px solid rgb(255 255 255 / 0.8);
+  box-shadow: 0 40px 70px -48px rgb(42 28 19 / 0.55);
+  transition: transform 0.7s var(--ease), box-shadow 0.7s var(--ease);
+}
+.teaser__visual { position: relative; display: block; aspect-ratio: 16 / 11; overflow: hidden; }
+.teaser .treatment__visual { display: grid; place-items: center; width: 100%; aspect-ratio: 16 / 11; border-radius: 0; }
+.teaser .treatment__vertical { font-size: clamp(2rem, 4vw, 3rem); }
+.teaser__visual picture, .teaser__visual img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+.teaser__visual img { transition: transform 1.2s var(--ease); }
+.teaser__body { display: grid; align-content: start; gap: 0.6rem; padding: clamp(1.4rem, 3vw, 2.2rem); }
+.teaser__num { font-family: var(--f-serif); font-style: italic; font-size: 1.15rem; color: var(--saffron-deep); }
+.teaser__name { font-family: var(--f-serif); font-size: clamp(2rem, 3.4vw, 2.7rem); line-height: 1.05; }
+.teaser__name [lang='ja'] { display: block; margin-top: 0.5rem; font-family: var(--f-mincho); font-size: 0.9rem; letter-spacing: 0.22em; color: var(--ink-2); }
+.teaser__text { color: var(--ink-2); max-width: 30rem; }
+.teaser__go { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 0.6rem; font-size: 0.88rem; letter-spacing: 0.06em; color: var(--saffron-deep); }
+.teaser__go .icon { transition: transform 0.45s var(--ease); }
+@media (hover: hover) {
+  .teaser:hover { transform: translateY(-6px); box-shadow: 0 50px 80px -46px rgb(42 28 19 / 0.6); }
+  .teaser:hover .teaser__visual img { transform: scale(1.04); }
+  .teaser:hover .teaser__go .icon { transform: translateX(4px); }
+}
+
+/* Home: Visit. */
+.visit--teaser { background: var(--paper); }
+.visit-teaser { display: grid; gap: 2.5rem; align-items: center; }
+@media (min-width: 960px) { .visit-teaser { grid-template-columns: 1fr 1fr; gap: clamp(3rem, 7vw, 7rem); } }
+.visit-teaser__card { padding: clamp(1.4rem, 3vw, 2.4rem); }
+.details--compact { margin-top: 0; }
+.visit-teaser__card .visit__cta { margin-top: 1.8rem; }
+
+/* ---------- About ---------- */
+.profile__grid, .salon__grid { display: grid; gap: 3rem; align-items: start; }
+@media (min-width: 960px) {
+  .profile__grid { grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: clamp(3rem, 7vw, 7rem); }
+  .salon__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(3rem, 7vw, 7rem); align-items: end; }
+}
+.facts--panel { margin-top: 0; padding: 0.6rem clamp(1.2rem, 3vw, 2rem); border-top: 0; }
+.facts--panel .facts__row:last-child { border-bottom: 0; }
+.salon .prose { margin-top: 0; }
+
+/* ---------- Treatments: courses ---------- */
+.treatment { scroll-margin-top: var(--header-h); }
+.menu { padding-top: clamp(2rem, 5vw, 4rem); }
+.menu__how { max-width: 26rem; font-size: 0.88rem; color: var(--ink-2); }
+.menu__groups { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); }
+@media (min-width: 960px) { .menu__groups { grid-template-columns: 1fr 1fr; } }
+.course { padding: clamp(1.5rem, 3vw, 2.4rem); }
+.course__tag {
+  display: inline-block; padding: 0.3rem 0.8rem; border-radius: 999px;
+  background: rgb(246 213 138 / 0.4); border: 1px solid rgb(185 116 10 / 0.35);
+  font-size: 0.74rem; letter-spacing: 0.1em;
+}
+.course__name { margin-top: 1rem; font-family: var(--f-serif); font-size: clamp(1.6rem, 2.6vw, 2.1rem); font-weight: 400; line-height: 1.2; }
+html[lang='ja'] .course__name { font-family: var(--f-mincho); font-weight: 500; font-size: clamp(1.25rem, 2vw, 1.55rem); line-height: 1.55; letter-spacing: 0.04em; }
+.course__desc { margin-top: 0.9rem; color: var(--ink-2); font-size: 0.94rem; }
+.course__list { margin-top: 1.4rem; border-top: 1px solid var(--line); }
+.course__list li {
+  display: grid; grid-template-columns: 1fr auto; gap: 0.2rem 1rem; align-items: baseline;
+  padding-block: 0.95rem; border-bottom: 1px solid var(--line);
+}
+.course__opt { font-family: var(--f-serif); font-size: 1.25rem; }
+html[lang='ja'] .course__opt { font-family: var(--f-mincho); font-size: 1.05rem; letter-spacing: 0.08em; }
+.course__opt small { display: block; font-family: var(--f-sans); font-size: 0.74rem; letter-spacing: 0.06em; color: var(--saffron-deep); }
+.course__time { grid-column: 1; font-size: 0.82rem; color: var(--ink-2); }
+.course__price { grid-row: 1 / span 2; grid-column: 2; align-self: center; font-family: var(--f-serif); font-size: 1.5rem; font-variant-numeric: lining-nums tabular-nums; }
+.menu .menu-note { margin-top: clamp(1.5rem, 3vw, 2.5rem); }
+
+/* ---------- Visit ---------- */
+.visit__side { display: grid; gap: 1.5rem; align-content: start; }
+.visit__booking { padding: clamp(1.4rem, 3vw, 2.2rem); }
+.visit__h3 { font-family: var(--f-serif); font-size: 1.7rem; font-weight: 400; }
+html[lang='ja'] .visit__h3 { font-family: var(--f-mincho); font-size: 1.25rem; font-weight: 500; letter-spacing: 0.06em; }
+.checks { display: grid; gap: 0.7rem; margin: 1.2rem 0 1.6rem; font-size: 0.92rem; color: var(--ink-2); }
+.checks li { display: grid; grid-template-columns: auto 1fr; gap: 0.75rem; }
+.checks li::before { content: '✦'; font-size: 0.7rem; color: var(--saffron-deep); padding-top: 0.3rem; }
+.visit__side .dogs { margin-top: 0; }
+
+/* ---------- Book (end of each page) ---------- */
+.cta-band { padding-top: 0; }
+.cta-band__panel {
+  position: relative; overflow: hidden;
+  padding: clamp(2rem, 5vw, 4rem);
+  display: grid; gap: 1.4rem; justify-items: start;
+}
+.cta-band__panel::before {
+  content: ''; position: absolute; right: -12%; top: -40%; z-index: -1;
+  width: 60%; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle, rgb(233 162 27 / 0.45), transparent 65%);
+}
+.cta-band__kicker { font-size: 0.76rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--saffron-deep); }
+.cta-band__line { font-family: var(--f-serif); font-weight: 300; font-size: clamp(2.2rem, 5vw, 4rem); line-height: 1.1; }
+html[lang='ja'] .cta-band__line { font-family: var(--f-mincho); font-weight: 500; font-size: clamp(1.7rem, 3.6vw, 2.8rem); line-height: 1.5; letter-spacing: 0.04em; }
+.cta-band__actions { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 0.6rem; }
 
 /* ---------- Footer ---------- */
 .footer { background: var(--ink); color: var(--linen); padding: clamp(4rem, 8vw, 6rem) 0 2.5rem; overflow: hidden; }
@@ -625,5 +920,5 @@ html[lang='ja'] .footer__title { font-family: var(--f-mincho); font-size: 1.05re
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-  .js:not(.ready) :is([data-intro], [data-intro-name], [data-intro-photo]) { opacity: 1; }
+  .js:not(.ready) :is([data-intro], [data-intro-name], [data-intro-photo], [data-map-panel]) { opacity: 1; }
 }

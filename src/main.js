@@ -1,6 +1,7 @@
 import { initLang, getLang } from './lang.js';
 import { initNav } from './nav.js';
 import { initMotion, ScrollTrigger } from './motion.js';
+import { initSash } from './sash.js';
 import { initVideo } from './video.js';
 
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -8,6 +9,7 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 initLang();
 const { lenis } = initMotion({ reduceMotion });
 initNav({ lenis });
+initSash({ lenis, reduceMotion });
 initVideo({ reduceMotion });
 
 const whenIdle = (fn) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 300));
@@ -34,7 +36,7 @@ if (canvas) {
   );
 }
 
-// MapLibre: loaded when the Visit section comes near.
+// MapLibre (Visit page): loaded when the map comes near.
 const mapEl = document.querySelector('[data-map]');
 if (mapEl) {
   const io = new IntersectionObserver(
@@ -42,8 +44,8 @@ if (mapEl) {
       if (!entry.isIntersecting) return;
       io.disconnect();
       import('./map.js')
-        .then(({ initMap }) => initMap(mapEl, getLang()))
-        .catch(() => {});
+        .then(({ initMap }) => initMap(mapEl, { lang: getLang(), reduceMotion }))
+        .catch(() => mapEl.classList.add('is-fallback'));
     },
     { rootMargin: '800px 0px' },
   );

@@ -25,9 +25,9 @@ export function initMotion({ reduceMotion }) {
 
   if (!reduceMotion) {
     intro();
+    floatCards();
     reveals();
     parallax();
-    sash(lenis);
     fireGlow();
     document.addEventListener('langchange', () => ScrollTrigger.refresh());
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
@@ -76,16 +76,64 @@ function initHeader(lenis) {
 }
 
 function intro() {
+  const tl = gsap.timeline({ defaults: { ease: 'expo.out' }, delay: 0.1 });
+  const card = document.querySelector('[data-intro-photo]');
+  if (card) {
+    // The glass card swings up into place, then the photo wipes in on the glass.
+    tl.from(card, { y: 110, rotationX: 26, transformPerspective: 1400, duration: 2.2, clearProps: 'transform' }, 0)
+      .from(card.querySelector('.float-card__glass'), { autoAlpha: 0, duration: 1.4, ease: 'power2.out' }, 0.05)
+      .from(card.querySelector('.frame'), { clipPath: 'inset(100% 0% 0% 0%)', duration: 1.7, ease: 'expo.inOut' }, 0.15)
+      .from(card.querySelector('img'), { scale: 1.3, duration: 2.4 }, 0.3)
+      .from(card.querySelector('figcaption'), { autoAlpha: 0, x: -36, duration: 1.3 }, 1.15);
+  }
   const name = document.querySelector('[data-intro-name]');
-  const split = SplitText.create(name, { type: 'chars', charsClass: 'char' });
+  if (name) {
+    const split = SplitText.create(name, { type: 'chars', charsClass: 'char' });
+    tl.from(split.chars, { yPercent: 105, duration: 1.5, stagger: 0.09 }, 0.35);
+  }
+  tl.from('[data-intro]', { y: 26, autoAlpha: 0, duration: 1.3, stagger: 0.08 }, name ? 0.55 : 0.2);
+  // Visit: the map panel rises in like the AusMC venue map.
+  const panel = document.querySelector('[data-map-panel]');
+  if (panel) tl.from(panel, { y: 80, scale: 0.94, autoAlpha: 0, duration: 1.6, clearProps: 'transform' }, 0.25);
+}
 
-  gsap
-    .timeline({ defaults: { ease: 'expo.out' }, delay: 0.1 })
-    .from('[data-intro-photo] .frame', { clipPath: 'inset(100% 0% 0% 0%)', duration: 1.7, ease: 'expo.inOut' }, 0)
-    .from('[data-intro-photo] img', { scale: 1.3, duration: 2.4 }, 0.15)
-    .from(split.chars, { yPercent: 105, duration: 1.5, stagger: 0.09 }, 0.35)
-    .from('[data-intro]', { y: 26, autoAlpha: 0, duration: 1.3, stagger: 0.08 }, 0.55)
-    .from('[data-intro-photo] figcaption', { autoAlpha: 0, duration: 1 }, 1.2);
+// Glass photo cards hang in 3D: a slow float, and on desktop a tilt toward the pointer
+// with a sheen and shadow that follow it (CSS reads --px/--py).
+function floatCards() {
+  const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const REST_X = 4;
+  const REST_Y = -9;
+  gsap.utils.toArray('[data-tilt]').forEach((card) => {
+    gsap.set(card, { rotationX: REST_X, rotationY: REST_Y, '--px': 0, '--py': 0 });
+    gsap.to(card, { y: -12, duration: 3.6, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+    // Scrolling on, the card drifts back into space.
+    const section = card.closest('section');
+    if (section) {
+      gsap.to(card, { z: -360, ease: 'none', scrollTrigger: { trigger: section, start: 'top top', end: 'bottom top', scrub: 0.6 } });
+    }
+    if (!fine) {
+      gsap.to(card, { rotationY: REST_Y + 8, duration: 6.5, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+      return;
+    }
+    const to = (prop) => gsap.quickTo(card, prop, { duration: 1.1, ease: 'power3' });
+    const [rx, ry, px, py] = ['rotationX', 'rotationY', '--px', '--py'].map(to);
+    const area = card.closest('section') ?? card;
+    area.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      const nx = gsap.utils.clamp(-1, 1, (e.clientX - (r.left + r.width / 2)) / r.width);
+      const ny = gsap.utils.clamp(-1, 1, (e.clientY - (r.top + r.height / 2)) / r.height);
+      rx(REST_X - ny * 9);
+      ry(REST_Y + nx * 13);
+      px(nx);
+      py(ny);
+    });
+    area.addEventListener('pointerleave', () => {
+      rx(REST_X);
+      ry(REST_Y);
+      px(0);
+      py(0);
+    });
+  });
 }
 
 function reveals() {
@@ -135,22 +183,6 @@ function parallax() {
       { yPercent: 8, ease: 'none', scrollTrigger: { trigger: band.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } },
     );
   }
-}
-
-// The saffron sash drifts on its own and speeds up (or reverses) with scrolling.
-function sash(lenis) {
-  const track = document.querySelector('.sash__track');
-  if (!track) return;
-  const loop = gsap.to(track, { xPercent: -50, duration: 42, ease: 'none', repeat: -1 });
-  loop.totalTime(loop.duration() * 50); // room to play backwards
-  if (!lenis) return;
-  let dir = 1;
-  lenis.on('scroll', ({ velocity, direction }) => {
-    if (direction) dir = direction;
-    const boost = Math.min(Math.abs(velocity) * 0.4, 7);
-    gsap.to(loop, { timeScale: dir * (1 + boost), duration: 0.25, overwrite: true });
-    gsap.to(loop, { timeScale: dir, duration: 1.4, delay: 0.25, ease: 'power2.out' });
-  });
 }
 
 // "Staying by the fire": the glow leans toward the pointer.
