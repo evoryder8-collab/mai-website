@@ -1,23 +1,422 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Keep noindex until the site launches. -->
 <meta name="robots" content="noindex">
-<title>Mai · Coming soon</title>
-<style>
-  :root { color-scheme: light dark; }
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center;
-         font-family: system-ui, sans-serif; background: #faf8f5; color: #222; text-align: center; padding: 16px; }
-  @media (prefers-color-scheme: dark) { body { background: #141414; color: #eee; } }
-  h1 { font-weight: 500; font-size: clamp(1.8rem, 5vw, 3rem); margin: 0 0 .4em; }
-  p { opacity: .65; margin: 0; }
-</style>
+<title>Mai｜タイ伝統マッサージ セラピスト｜Memories Spa つくば</title>
+<meta name="description" content="世界大会3位・特別賞（Massage Championship World Tour 2025）。タイ政府認定セラピスト Mai による、ユーファイとヌアット・ティップパヤー。つくばの女性専用サロン Memories Spa にて。">
+<meta name="theme-color" content="#F3ECE0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Mai">
+<meta property="og:title" content="Mai — Thai Massage Therapist｜タイ伝統マッサージ セラピスト">
+<meta property="og:description" content="世界大会3位・特別賞 / 3rd Place &amp; Special Award, Massage Championship World Tour 2025">
+<meta property="og:image" content="https://evoryder8-collab.github.io/mai-website/media/og-image.jpg">
+<meta property="og:url" content="https://evoryder8-collab.github.io/mai-website/">
+<meta name="twitter:card" content="summary_large_image">
+
+<script>
+  // Pick the language before first paint so the page never flashes the wrong one.
+  (function () {
+    var d = document.documentElement, l;
+    d.classList.add('js');
+    try { l = new URLSearchParams(location.search).get('lang') || localStorage.getItem('mai-lang'); } catch (e) {}
+    if (l !== 'ja' && l !== 'en') {
+      var langs = navigator.languages || [navigator.language || ''];
+      l = 'en';
+      for (var i = 0; i < langs.length; i++) if (/^ja/i.test(langs[i])) { l = 'ja'; break; }
+    }
+    d.lang = l;
+    // If the scripts never arrive, show everything anyway.
+    setTimeout(function () { d.classList.add('ready'); }, 2500);
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Shippori+Mincho+B1:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/src/styles/main.css">
+<script type="module" src="/src/main.js"></script>
 </head>
 <body>
-  <main>
-    <h1>Mai</h1>
-    <p>New website coming soon.</p>
-  </main>
+<a class="skip-link" href="#main"><span data-l="ja">本文へ移動</span><span data-l="en">Skip to content</span></a>
+
+<header class="site-header" data-header>
+  <div class="site-header__inner">
+    <a class="brand" href="#top">
+      <span class="brand__name">Mai</span>
+      <span class="brand__tag"><span data-l="ja">タイ伝統マッサージ</span><span data-l="en">Thai Massage</span></span>
+    </a>
+
+    <nav class="nav" id="site-nav" aria-label="Main">
+      <ul class="nav__list">
+        <li><a href="#award"><span data-l="ja">受賞</span><span data-l="en">Award</span></a></li>
+        <li><a href="#about"><span data-l="ja">プロフィール</span><span data-l="en">About</span></a></li>
+        <li><a href="#treatments"><span data-l="ja">施術</span><span data-l="en">Treatments</span></a></li>
+        <li><a href="#visit"><span data-l="ja">アクセス</span><span data-l="en">Visit</span></a></li>
+      </ul>
+      <a class="btn btn--saffron nav__book" href="https://memories-spa33.stores.jp/reserve/MemoriesSpaTukuba" target="_blank" rel="noopener">
+        <span data-l="ja">ご予約はこちら</span><span data-l="en">Book a session</span>
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </a>
+    </nav>
+
+    <div class="site-header__actions">
+      <div class="lang-switch" role="group" aria-label="Language / 言語">
+        <button type="button" data-set-lang="ja" lang="ja">JP</button>
+        <span aria-hidden="true">/</span>
+        <button type="button" data-set-lang="en" lang="en">EN</button>
+      </div>
+      <a class="btn btn--saffron btn--sm header-book" href="https://memories-spa33.stores.jp/reserve/MemoriesSpaTukuba" target="_blank" rel="noopener">
+        <span data-l="ja">予約</span><span data-l="en">Book</span>
+      </a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav">
+        <span class="visually-hidden"><span data-l="ja">メニュー</span><span data-l="en">Menu</span></span>
+        <span class="menu-toggle__bars" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO -->
+  <section class="hero" id="top" aria-labelledby="hero-name">
+    <canvas class="hero__cloth" aria-hidden="true"></canvas>
+    <div class="hero__sash-fallback" aria-hidden="true"></div>
+
+    <div class="container hero__grid">
+      <div class="hero__text">
+        <p class="eyebrow" data-intro>
+          <span class="eyebrow__star" aria-hidden="true">✦</span>
+          <span data-l="ja">世界大会3位・特別賞</span><span data-l="en">3rd Place &amp; Special Award</span>
+          <span class="eyebrow__sep" aria-hidden="true">—</span>
+          <span>MCWT 2025</span>
+        </p>
+
+        <h1 class="hero__name" id="hero-name" data-intro-name>Mai</h1>
+
+        <div class="hero__role" data-intro>
+          <p><span data-l="ja">タイ政府認定セラピスト</span><span data-l="en">Thai Government–Certified Therapist</span></p>
+          <p class="hero__place"><span data-l="ja">Memories Spa セラピストチーフ・茨城県つくば市</span><span data-l="en">Therapist Chief at Memories Spa, Tsukuba</span></p>
+        </div>
+
+        <p class="hero__lead" data-intro>
+          <span data-l="ja">手のひらから伝わる確かな温もりと、身体を包み込むようななめらかな手技で、こわばった全身をすっきりと解き放ちます。</span>
+          <span data-l="en">The steady warmth of her palms and a smooth, enveloping touch that releases tension from head to toe.</span>
+        </p>
+
+        <div class="hero__cta" data-intro>
+          <a class="btn btn--saffron" href="https://memories-spa33.stores.jp/reserve/MemoriesSpaTukuba" target="_blank" rel="noopener">
+            <span data-l="ja">ご予約はこちら</span><span data-l="en">Book a session</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+          <a class="btn btn--line" href="#award">
+            <span data-l="ja">受賞について</span><span data-l="en">See the award</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+          </a>
+        </div>
+
+        <p class="hero__note" data-intro><span data-l="ja">女性専用・完全予約制</span><span data-l="en">Women only · By reservation</span></p>
+      </div>
+
+      <figure class="hero__photo" data-intro-photo>
+        <div class="frame">
+          <picture>
+            <source type="image/avif" srcset="/media/mai-stretch-640.avif 640w, /media/mai-stretch-1080.avif 1080w, /media/mai-stretch-1600.avif 1600w" sizes="(min-width: 1080px) 34vw, (min-width: 760px) 44vw, 88vw">
+            <img src="/media/mai-stretch-1080.jpg" srcset="/media/mai-stretch-640.jpg 640w, /media/mai-stretch-1080.jpg 1080w, /media/mai-stretch-1600.jpg 1600w" sizes="(min-width: 1080px) 34vw, (min-width: 760px) 44vw, 88vw" width="1672" height="2508" alt="Mai performing a Thai massage stretch at the Massage Championship World Tour 2025" fetchpriority="high">
+          </picture>
+        </div>
+        <figcaption>Massage Championship World Tour 2025</figcaption>
+      </figure>
+
+      <p class="hero__vertical" lang="ja" aria-hidden="true">タイ伝統マッサージ　セラピスト</p>
+    </div>
+
+    <a class="hero__scroll" href="#award" aria-label="Scroll">
+      <span class="hero__scroll-line" aria-hidden="true"></span>
+      <span>Scroll</span>
+    </a>
+  </section>
+
+  <!-- SASH -->
+  <div class="sash" aria-hidden="true">
+    <div class="sash__track">
+      <span class="sash__set">
+        <span lang="ja">世界大会3位</span><i>✦</i><span>Special Award</span><i>✦</i><span lang="ja">タイ政府認定セラピスト</span><i>✦</i><span>World Championship 3rd</span><i>✦</i><span lang="ja">特別賞</span><i>✦</i><span>Thai Government–Certified</span><i>✦</i>
+      </span>
+      <span class="sash__set">
+        <span lang="ja">世界大会3位</span><i>✦</i><span>Special Award</span><i>✦</i><span lang="ja">タイ政府認定セラピスト</span><i>✦</i><span>World Championship 3rd</span><i>✦</i><span lang="ja">特別賞</span><i>✦</i><span>Thai Government–Certified</span><i>✦</i>
+      </span>
+    </div>
+  </div>
+
+  <!-- AWARD -->
+  <section class="section award" id="award" aria-labelledby="award-title">
+    <div class="container award__grid">
+      <div class="award__text">
+        <p class="label" data-reveal><span class="label__num">01</span><span data-l="ja">受賞</span><span data-l="en">Award</span></p>
+
+        <p class="award__numeral" aria-hidden="true" data-numeral>3<span class="award__suffix"><span data-l="ja">位</span><span data-l="en">rd</span></span></p>
+
+        <h2 class="h2" id="award-title" data-reveal>
+          <span data-l="ja">世界大会3位・特別賞 受賞</span>
+          <span data-l="en">3rd Place &amp; Special Award</span>
+        </h2>
+
+        <div class="prose" data-reveal>
+          <p data-l="ja">タイ伝統マッサージの世界大会「Massage Championship World Tour 2025」にて、卓越した技術と極上のタッチが認められ、世界大会3位および特別賞を受賞しました。</p>
+          <p data-l="en">At the Massage Championship World Tour 2025, judges recognised Mai’s exceptional technique and touch in Thai traditional massage with 3rd place and a Special Award.</p>
+        </div>
+
+        <dl class="facts" data-reveal>
+          <div class="facts__row">
+            <dt><span data-l="ja">大会</span><span data-l="en">Event</span></dt>
+            <dd>Massage Championship World Tour 2025</dd>
+          </div>
+          <div class="facts__row">
+            <dt><span data-l="ja">結果</span><span data-l="en">Result</span></dt>
+            <dd><span data-l="ja">世界3位・特別賞</span><span data-l="en">3rd place · Special Award</span></dd>
+          </div>
+          <div class="facts__row">
+            <dt><span data-l="ja">部門</span><span data-l="en">Discipline</span></dt>
+            <dd><span data-l="ja">タイ伝統マッサージ</span><span data-l="en">Thai traditional massage</span></dd>
+          </div>
+        </dl>
+      </div>
+
+      <figure class="award__video" data-reveal>
+        <div class="video-frame">
+          <video data-award-video muted playsinline preload="metadata" poster="/media/award-ceremony-poster.jpg" width="720" height="1280">
+            <source src="/media/award-ceremony.mp4" type="video/mp4">
+          </video>
+          <button class="video-sound" type="button" aria-pressed="false" data-video-sound>
+            <svg class="icon icon--off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="m17 9 4 6M21 9l-4 6"/></svg>
+            <svg class="icon icon--on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+            <span class="video-sound__off"><span data-l="ja">音を出して観る</span><span data-l="en">Watch with sound</span></span>
+            <span class="video-sound__on"><span data-l="ja">ミュート</span><span data-l="en">Mute</span></span>
+          </button>
+        </div>
+        <figcaption><span data-l="ja">授賞式にて</span><span data-l="en">At the award ceremony</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section about" id="about" aria-labelledby="about-title">
+    <div class="container about__grid">
+      <figure class="about__photo" data-reveal-photo>
+        <div class="frame frame--parallax">
+          <picture>
+            <source type="image/avif" srcset="/media/mai-cloth-smile-640.avif 640w, /media/mai-cloth-smile-1080.avif 1080w, /media/mai-cloth-smile-1600.avif 1600w" sizes="(min-width: 1080px) 38vw, (min-width: 760px) 44vw, 88vw">
+            <img src="/media/mai-cloth-smile-1080.jpg" srcset="/media/mai-cloth-smile-640.jpg 640w, /media/mai-cloth-smile-1080.jpg 1080w, /media/mai-cloth-smile-1600.jpg 1600w" sizes="(min-width: 1080px) 38vw, (min-width: 760px) 44vw, 88vw" width="1672" height="2508" alt="Mai smiling with her eyes closed as she works the long cloth" loading="lazy" decoding="async">
+          </picture>
+        </div>
+      </figure>
+
+      <div class="about__text">
+        <p class="label" data-reveal><span class="label__num">02</span><span data-l="ja">プロフィール</span><span data-l="en">About Mai</span></p>
+        <h2 class="h2 h2--xl" id="about-title" data-reveal>
+          <span data-l="ja">温もりで、ほどく。</span>
+          <span data-l="en">Warmth that unwinds.</span>
+        </h2>
+
+        <div class="prose" data-reveal>
+          <p data-l="ja">タイ政府認定セラピストとして、つくばの女性専用サロン Memories Spa でセラピストチーフを務める Mai。タイに伝わるハーブ温熱療法「ユーファイ」と、極上の癒しの時間を担当しています。</p>
+          <p data-l="en">A Thai government–certified therapist, Mai is Therapist Chief at Memories Spa, a women-only salon in Tsukuba. She leads its Yu-fai herbal heat therapy and its most deeply relaxing treatments.</p>
+          <p data-l="ja">手のひらから伝わる確かな温もりと、身体を包み込むようななめらかな手技は、硬直した全身をすっきりと解き放ち、自律神経を最高の休息状態へと優しく導きます。</p>
+          <p data-l="en">The steady warmth of her palms and her smooth, enveloping technique release a stiff body from head to toe, gently guiding the nervous system into its deepest rest.</p>
+        </div>
+
+        <ul class="creds" data-reveal>
+          <li><span data-l="ja">タイ政府認定セラピスト</span><span data-l="en">Thai government–certified therapist</span></li>
+          <li><span data-l="ja">世界大会3位・特別賞（MCWT 2025）</span><span data-l="en">3rd place &amp; Special Award, MCWT 2025</span></li>
+          <li><span data-l="ja">Memories Spa セラピストチーフ</span><span data-l="en">Therapist Chief, Memories Spa</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- BAND -->
+  <section class="band" aria-label="美健相互">
+    <div class="band__media" data-band>
+      <picture>
+        <source type="image/avif" srcset="/media/mai-forearm-1080.avif 1080w, /media/mai-forearm-1600.avif 1600w" sizes="100vw">
+        <img src="/media/mai-forearm-1600.jpg" srcset="/media/mai-forearm-1080.jpg 1080w, /media/mai-forearm-1600.jpg 1600w" sizes="100vw" width="2508" height="1672" alt="Mai leaning into a forearm technique, looking upward" loading="lazy" decoding="async">
+      </picture>
+    </div>
+    <div class="container band__content">
+      <p class="band__kicker" lang="ja" data-reveal>美健相互 <span lang="en">— Biken sōgo</span></p>
+      <p class="band__line" data-reveal>
+        <span data-l="ja">美しさと健やかさは、<br>互いに響き合う。</span>
+        <span data-l="en">Beauty and wellbeing,<br>each shaping the other.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- TREATMENTS -->
+  <section class="section treatments" id="treatments" aria-labelledby="treatments-title">
+    <div class="container">
+      <header class="section-head">
+        <p class="label" data-reveal><span class="label__num">03</span><span data-l="ja">施術</span><span data-l="en">Treatments</span></p>
+        <h2 class="h2" id="treatments-title" data-reveal>
+          <span data-l="ja">Mai が担当する、<br>ふたつのタイ伝統ケア。</span>
+          <span data-l="en">Two Thai traditions,<br>in Mai’s hands.</span>
+        </h2>
+      </header>
+
+      <article class="treatment treatment--fire" data-fire>
+        <div class="treatment__visual" aria-hidden="true">
+          <div class="fire-glow" data-fire-glow></div>
+          <p class="treatment__vertical" lang="ja">ユーファイ</p>
+        </div>
+        <div class="treatment__body" data-reveal>
+          <p class="treatment__num">01</p>
+          <h3 class="treatment__name">Yu-fai <span lang="ja">ユーファイ</span></h3>
+          <p class="treatment__meaning"><span data-l="ja">タイ語で「火のそばにいる」</span><span data-l="en">Thai for “staying by the fire”</span></p>
+          <div class="prose">
+            <p data-l="ja">タイ語で「火のそばにいる」という意味を持つ、タイの伝統的なハーブ温熱療法です。2,600年以上の歴史を持つタイ伝統医学に基づき、もともとは出産後の女性が体力を回復するための産後ケアとして受け継がれてきました。現在では産後だけでなく、冷えやホルモンバランスの乱れに悩むすべての女性のためのケアとして注目されています。</p>
+            <p data-l="en">A traditional Thai herbal heat therapy rooted in more than 2,600 years of Thai medicine. It was handed down as postpartum care, helping new mothers recover their strength. Today it is valued by any woman who struggles with feeling cold or with hormonal imbalance.</p>
+          </div>
+          <ul class="tags">
+            <li><span data-l="ja">温活</span><span data-l="en">Warming</span></li>
+            <li><span data-l="ja">ハーブ</span><span data-l="en">Herbal</span></li>
+            <li><span data-l="ja">産後ケア</span><span data-l="en">Postpartum care</span></li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="treatment treatment--cloth">
+        <figure class="treatment__photo" data-reveal-photo>
+          <div class="frame frame--parallax">
+            <picture>
+              <source type="image/avif" srcset="/media/mai-cloth-pull-640.avif 640w, /media/mai-cloth-pull-1080.avif 1080w, /media/mai-cloth-pull-1600.avif 1600w" sizes="(min-width: 1080px) 34vw, (min-width: 760px) 44vw, 88vw">
+              <img src="/media/mai-cloth-pull-1080.jpg" srcset="/media/mai-cloth-pull-640.jpg 640w, /media/mai-cloth-pull-1080.jpg 1080w, /media/mai-cloth-pull-1600.jpg 1600w" sizes="(min-width: 1080px) 34vw, (min-width: 760px) 44vw, 88vw" width="1672" height="2508" alt="Mai drawing a long cloth to stretch her client" loading="lazy" decoding="async">
+            </picture>
+          </div>
+        </figure>
+        <div class="treatment__body" data-reveal>
+          <p class="treatment__num">02</p>
+          <h3 class="treatment__name">Nuat Thippaya <span lang="ja">ヌアット・ティップパヤー</span></h3>
+          <p class="treatment__meaning"><span data-l="ja">ロングクロスを使うタイ式マッサージ</span><span data-l="en">Thai massage with a long cloth</span></p>
+          <div class="prose">
+            <p data-l="ja">タイ伝統医学をベースに新しく考案され、近年世界や日本国内でも注目されている、タイ式独自の「布（ロングクロス）」を使ったマッサージ・ストレッチ技術です。布で包み込むことで、手や指によるピンポイントの痛みや擦れを軽減。肌あたりが優しく、深い安心感とリラックス効果を得られます。</p>
+            <p data-l="en">A newer technique built on Thai traditional medicine, now drawing attention worldwide and across Japan. Mai massages and stretches the body through a long cloth, which softens the pinpoint pressure and friction of hands and fingers. It feels gentle on the skin and deeply reassuring.</p>
+          </div>
+          <ul class="tags">
+            <li><span data-l="ja">ロングクロス</span><span data-l="en">Long cloth</span></li>
+            <li><span data-l="ja">ストレッチ</span><span data-l="en">Stretching</span></li>
+            <li><span data-l="ja">肌にやさしい</span><span data-l="en">Gentle on skin</span></li>
+          </ul>
+        </div>
+      </article>
+
+      <div class="menu-note" data-reveal>
+        <p><span data-l="ja">コース・料金・空き状況は、予約ページでご確認いただけます。</span><span data-l="en">Courses, prices and availability are listed on the booking page.</span></p>
+        <a class="btn btn--ink" href="https://memories-spa33.stores.jp/reserve/MemoriesSpaTukuba/booking_pages" target="_blank" rel="noopener">
+          <span data-l="ja">メニュー・料金を見る</span><span data-l="en">See menu &amp; prices</span>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- VISIT -->
+  <section class="section visit" id="visit" aria-labelledby="visit-title">
+    <div class="container visit__grid">
+      <div class="visit__info">
+        <p class="label" data-reveal><span class="label__num">04</span><span data-l="ja">アクセス</span><span data-l="en">Visit</span></p>
+        <h2 class="h2" id="visit-title" data-reveal>
+          <span data-l="ja">Memories Spa で<br>お待ちしています。</span>
+          <span data-l="en">Find Mai at<br>Memories Spa.</span>
+        </h2>
+        <div class="prose" data-reveal>
+          <p data-l="ja">女性のためのタイ美温健ケアと鍼灸治療のサロン。完全プライベートな空間のため、完全予約制です。</p>
+          <p data-l="en">A private salon for women, offering Thai warming beauty-and-health care and acupuncture. Visits are by reservation only.</p>
+        </div>
+
+        <ul class="pills" data-reveal>
+          <li><span data-l="ja">女性専用</span><span data-l="en">Women only</span></li>
+          <li><span data-l="ja">完全予約制</span><span data-l="en">By reservation</span></li>
+          <li><span data-l="ja">小型犬同伴OK</span><span data-l="en">Small dogs welcome</span></li>
+        </ul>
+
+        <div class="dogs" data-reveal>
+          <svg class="dogs__paw" viewBox="0 0 32 32" aria-hidden="true"><ellipse cx="16" cy="21" rx="6.5" ry="5.5"/><ellipse cx="7.5" cy="13.5" rx="2.6" ry="3.4"/><ellipse cx="12.5" cy="8.5" rx="2.6" ry="3.4"/><ellipse cx="19.5" cy="8.5" rx="2.6" ry="3.4"/><ellipse cx="24.5" cy="13.5" rx="2.6" ry="3.4"/></svg>
+          <p data-l="ja">小型犬なら、愛犬と一緒にご来店いただけます。看板犬の「ラテ」と「麦」もお待ちしています。同伴をご希望の際は、ご予約時にお知らせください。</p>
+          <p data-l="en">Small dogs are welcome to stay by your side during treatment, and shop dogs Latte and Mugi will be there to greet you. Just mention it when you book.</p>
+        </div>
+
+        <dl class="details" data-reveal>
+          <div class="details__row">
+            <dt><span data-l="ja">住所</span><span data-l="en">Address</span></dt>
+            <dd>
+              <span data-l="ja">〒305-0004<br>茨城県つくば市柴崎68-17</span>
+              <span data-l="en">68-17 Shibasaki, Tsukuba,<br>Ibaraki 305-0004, Japan</span>
+            </dd>
+          </div>
+          <div class="details__row">
+            <dt><span data-l="ja">営業時間</span><span data-l="en">Hours</span></dt>
+            <dd>
+              <table class="hours">
+                <tr><th scope="row"><span data-l="ja">月・火・水</span><span data-l="en">Mon – Wed</span></th><td>8:30 – 20:00</td></tr>
+                <tr class="hours__closed"><th scope="row"><span data-l="ja">木</span><span data-l="en">Thu</span></th><td><span data-l="ja">定休日</span><span data-l="en">Closed</span></td></tr>
+                <tr><th scope="row"><span data-l="ja">金</span><span data-l="en">Fri</span></th><td>8:30 – 18:00</td></tr>
+                <tr><th scope="row"><span data-l="ja">土・日</span><span data-l="en">Sat – Sun</span></th><td>8:30 – 20:00</td></tr>
+              </table>
+            </dd>
+          </div>
+          <div class="details__row">
+            <dt><span data-l="ja">お支払い</span><span data-l="en">Payment</span></dt>
+            <dd><span data-l="ja">現金・クレジットカード・PayPay</span><span data-l="en">Cash, credit card, PayPay</span></dd>
+          </div>
+        </dl>
+
+        <div class="visit__cta" data-reveal>
+          <a class="btn btn--saffron" href="https://memories-spa33.stores.jp/reserve/MemoriesSpaTukuba" target="_blank" rel="noopener">
+            <span data-l="ja">ご予約はこちら</span><span data-l="en">Book a session</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+          <a class="btn btn--line" href="https://maps.app.goo.gl/N2Um8Rq3mxPRhw4h7" target="_blank" rel="noopener">
+            <span data-l="ja">Google マップで開く</span><span data-l="en">Open in Google Maps</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="visit__map" data-reveal-photo>
+        <div class="map" data-map role="region" aria-label="Map: Memories Spa, Tsukuba">
+          <a class="map__fallback" href="https://maps.app.goo.gl/N2Um8Rq3mxPRhw4h7" target="_blank" rel="noopener">
+            <span data-l="ja">地図を開く</span><span data-l="en">Open the map</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <p class="footer__word" aria-hidden="true">Mai</p>
+    <div class="footer__grid">
+      <div>
+        <p class="footer__title"><span data-l="ja">タイ伝統マッサージ セラピスト</span><span data-l="en">Thai Massage Therapist</span></p>
+        <p>Memories Spa · <span data-l="ja">茨城県つくば市</span><span data-l="en">Tsukuba, Ibaraki</span></p>
+      </div>
+      <ul class="footer__links">
+        <li><a href="https://memories-spa33.stores.jp/reserve/MemoriesSpaTukuba" target="_blank" rel="noopener"><span data-l="ja">ご予約</span><span data-l="en">Book</span></a></li>
+        <li><a href="https://memories-spa33.stores.jp/reserve/MemoriesSpaTukuba/booking_pages" target="_blank" rel="noopener"><span data-l="ja">メニュー・料金</span><span data-l="en">Menu &amp; prices</span></a></li>
+        <li><a href="https://maps.app.goo.gl/N2Um8Rq3mxPRhw4h7" target="_blank" rel="noopener"><span data-l="ja">地図</span><span data-l="en">Map</span></a></li>
+      </ul>
+      <div class="footer__small">
+        <p><span data-l="ja">写真・映像：Massage Championship World Tour 2025</span><span data-l="en">Photos &amp; film: Massage Championship World Tour 2025</span></p>
+        <p>© 2026 Mai</p>
+      </div>
+    </div>
+  </div>
+</footer>
 </body>
 </html>

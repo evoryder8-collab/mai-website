@@ -1,0 +1,51 @@
+import { initLang, getLang } from './lang.js';
+import { initNav } from './nav.js';
+import { initMotion, ScrollTrigger } from './motion.js';
+import { initVideo } from './video.js';
+
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+initLang();
+const { lenis } = initMotion({ reduceMotion });
+initNav({ lenis });
+initVideo({ reduceMotion });
+
+const whenIdle = (fn) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 300));
+
+// three.js cloth: loaded once the browser is idle after first render.
+const hero = document.querySelector('.hero');
+const canvas = hero?.querySelector('.hero__cloth');
+if (canvas) {
+  whenIdle(() =>
+    import('./cloth.js')
+      .then(({ initCloth }) => {
+        const cloth = initCloth(canvas, { reduceMotion, onReady: () => hero.classList.add('has-cloth') });
+        if (!cloth) return hero.classList.add('no-webgl');
+        if (!reduceMotion) {
+          ScrollTrigger.create({
+            trigger: hero,
+            start: 'top top',
+            end: 'bottom top',
+            onUpdate: (self) => cloth.setPull(self.progress),
+          });
+        }
+      })
+      .catch(() => hero.classList.add('no-webgl')),
+  );
+}
+
+// MapLibre: loaded when the Visit section comes near.
+const mapEl = document.querySelector('[data-map]');
+if (mapEl) {
+  const io = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry.isIntersecting) return;
+      io.disconnect();
+      import('./map.js')
+        .then(({ initMap }) => initMap(mapEl, getLang()))
+        .catch(() => {});
+    },
+    { rootMargin: '800px 0px' },
+  );
+  io.observe(mapEl);
+}

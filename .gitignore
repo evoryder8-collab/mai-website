@@ -1,2 +1,6 @@
 .DS_Store
 .claude/settings.local.json
+node_modules/
+dist/
+# Originals stay local: they carry camera/GPS metadata. Web copies are in public/media/.
+media-src/
