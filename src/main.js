@@ -1,3 +1,5 @@
+import { initButtons } from './buttons.js';
+import { initDirections } from './directions.js';
 import { initLang, getLang } from './lang.js';
 import { initNav } from './nav.js';
 import { initMotion, ScrollTrigger } from './motion.js';
@@ -11,6 +13,8 @@ const { lenis } = initMotion({ reduceMotion });
 initNav({ lenis });
 initSash({ lenis, reduceMotion });
 initVideo({ reduceMotion });
+initButtons({ reduceMotion });
+initDirections({ lenis, reduceMotion });
 
 const whenIdle = (fn) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 300));
 

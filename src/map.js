@@ -276,9 +276,15 @@ export async function initMap(container, { lang, reduceMotion }) {
   map.addControl(new AttributionControl({ compact: true }), 'bottom-right');
   map.addControl(new NavigationControl({ visualizePitch: true }), 'top-right');
 
-  const pin = document.createElement('div');
+  // Tapping the pin offers directions straight away.
+  const pin = document.createElement('button');
+  pin.type = 'button';
   pin.className = 'map-pin';
   pin.innerHTML = '<span class="map-pin__label">Memories Spa</span><span class="map-pin__dot"></span>';
+  pin.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.dispatchEvent(new CustomEvent('mai:directions'));
+  });
   new Marker({ element: pin, anchor: 'center' }).setLngLat(SPA).addTo(map);
 
   // The orbit re-renders the 3D city every frame, so it only runs while the map is seen.

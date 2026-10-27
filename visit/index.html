@@ -44,9 +44,9 @@
             <span data-l="ja">ご予約はこちら</span><span data-l="en">Book a session</span>
             <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
           </a>
-          <a class="btn btn--line" href="https://maps.app.goo.gl/N2Um8Rq3mxPRhw4h7" target="_blank" rel="noopener">
-            <span data-l="ja">Google マップで経路</span><span data-l="en">Directions in Google Maps</span>
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          <a class="btn btn--line" href="https://maps.app.goo.gl/N2Um8Rq3mxPRhw4h7" target="_blank" rel="noopener" data-directions>
+            <span data-l="ja">経路を調べる</span><span data-l="en">Get directions</span>
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-8-8 18-2-8z"/></svg>
           </a>
         </div>
       </div>
@@ -57,10 +57,11 @@
             <span data-l="ja">地図を開く</span><span data-l="en">Open the map</span>
           </a>
         </div>
-        <p class="map-panel__chip glass-chip">
+        <a class="map-panel__chip glass-chip" href="https://maps.app.goo.gl/N2Um8Rq3mxPRhw4h7" target="_blank" rel="noopener" data-directions>
           <span class="glass-chip__title">Memories Spa</span>
           <span class="glass-chip__sub"><span data-l="ja">茨城県つくば市柴崎68-17</span><span data-l="en">68-17 Shibasaki, Tsukuba</span></span>
-        </p>
+          <span class="glass-chip__go"><span data-l="ja">経路を調べる</span><span data-l="en">Get directions</span><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 18-8-8 18-2-8z"/></svg></span>
+        </a>
       </div>
     </div>
   </section>
@@ -100,6 +101,11 @@
             <dd><span data-l="ja">現金・クレジットカード・PayPay</span><span data-l="en">Cash, credit card, PayPay</span></dd>
           </div>
         </dl>
+
+        <a class="more" href="https://maps.app.goo.gl/N2Um8Rq3mxPRhw4h7" target="_blank" rel="noopener" data-directions data-reveal>
+          <span data-l="ja">Google マップ・Apple マップで経路を調べる</span><span data-l="en">Directions in Google Maps or Apple Maps</span>
+          <span class="more__arrow" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="m3 11 18-8-8 18-2-8z"/></svg></span>
+        </a>
       </div>
 
       <div class="visit__side">
