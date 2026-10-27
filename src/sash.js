@@ -63,7 +63,9 @@ export function initSash({ lenis, reduceMotion }) {
     dragSpeed = 0;
     speed = 0;
     sash.classList.add('is-grabbed');
-    sash.setPointerCapture(pointer);
+    try {
+      sash.setPointerCapture(pointer);
+    } catch {}
   });
 
   sash.addEventListener('pointermove', (e) => {
@@ -81,6 +83,7 @@ export function initSash({ lenis, reduceMotion }) {
   const release = (e) => {
     if (e.pointerId !== pointer) return;
     speed = performance.now() - prevTime > HOLD_MS ? 0 : dragSpeed;
+    if (Math.abs(speed) > 300) document.dispatchEvent(new CustomEvent('mai:fling', { detail: { speed } }));
     pointer = undefined;
     sash.classList.remove('is-grabbed');
     if (sash.hasPointerCapture(e.pointerId)) sash.releasePointerCapture(e.pointerId);

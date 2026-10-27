@@ -1,88 +1,101 @@
-// Japanese/English switch. Both languages live in the HTML (data-l="ja" / data-l="en");
-// CSS hides the one that doesn't match <html lang>. The inline script in
-// src/partials/head.html picks the starting language before first paint.
+// Eight languages. Japanese is written into the HTML (it's the default, and what shows
+// without JavaScript); every translatable element carries data-t="key", and the
+// dictionary for the active language (src/i18n/<code>.json) replaces its contents.
+// The inline script in src/partials/head.html sets <html lang> before first paint and
+// hides the page (html.i18n-pending) until a non-Japanese dictionary has been applied.
 
-// Title and description per page (<body data-page>) and language.
-const META = {
-  home: {
-    ja: {
-      title: 'Mai｜タイ伝統マッサージ セラピスト｜Memories Spa つくば',
-      description: 'タイ伝統マッサージの世界大会で3位・特別賞を受賞したタイ政府認定セラピスト Mai。ユーファイとヌアット・ティップパヤーを、つくばの女性専用サロン Memories Spa にて。',
-    },
-    en: {
-      title: 'Mai — Thai Massage Therapist · Memories Spa, Tsukuba',
-      description: 'Thai government–certified therapist Mai, 3rd place and Special Award at a world championship in Thai traditional massage. Yu-fai and Nuat Thippaya at Memories Spa, a women-only salon in Tsukuba.',
-    },
-  },
-  award: {
-    ja: {
-      title: '受賞｜Mai タイ伝統マッサージ セラピスト',
-      description: 'タイ伝統マッサージの世界大会で、卓越した技術と極上のタッチが認められ世界大会3位・特別賞を受賞。Massage Championship World Tour 2025 授賞式の映像とともに。',
-    },
-    en: {
-      title: 'Award · Mai, Thai Massage Therapist',
-      description: 'Mai’s technique and touch earned 3rd place and a Special Award at a world championship in Thai traditional massage. With film from the Massage Championship World Tour 2025 award ceremony.',
-    },
-  },
-  about: {
-    ja: {
-      title: 'プロフィール｜Mai タイ伝統マッサージ セラピスト',
-      description: 'タイ政府認定セラピスト Mai。つくばの女性専用サロン Memories Spa のセラピストチーフとして、ユーファイと極上の癒しの時間を担当しています。',
-    },
-    en: {
-      title: 'About · Mai, Thai Massage Therapist',
-      description: 'Thai government–certified therapist Mai is Therapist Chief at Memories Spa, a women-only salon in Tsukuba, where she leads Yu-fai and the most deeply relaxing treatments.',
-    },
-  },
-  treatments: {
-    ja: {
-      title: '施術・コース｜Mai タイ伝統マッサージ セラピスト',
-      description: 'タイ伝統のハーブ温熱療法「ユーファイ」と、布を使うマッサージ「ヌアット・ティップパヤー」。Mai が担当するタイ伝統ケアとコース・料金のご案内。',
-    },
-    en: {
-      title: 'Treatments · Mai, Thai Massage Therapist',
-      description: 'Yu-fai, Thailand’s traditional herbal heat therapy, and Nuat Thippaya, massage through a long cloth. Mai’s treatments, courses and prices.',
-    },
-  },
-  visit: {
-    ja: {
-      title: 'アクセス｜Mai タイ伝統マッサージ セラピスト｜Memories Spa つくば',
-      description: 'Memories Spa（茨城県つくば市柴崎68-17）へのアクセス、営業時間、お支払い、ご予約について。女性専用・完全予約制、小型犬同伴OK。',
-    },
-    en: {
-      title: 'Visit · Mai at Memories Spa, Tsukuba',
-      description: 'Directions, hours, payment and booking for Memories Spa, 68-17 Shibasaki, Tsukuba. Women only, by reservation, small dogs welcome.',
-    },
-  },
+export const LANGS = [
+  { code: 'ja', tag: 'ja', name: '日本語', english: 'Japanese', flag: 'jp' },
+  { code: 'en', tag: 'en', name: 'English', english: 'English', flag: 'gb' },
+  { code: 'zh', tag: 'zh-Hans', name: '简体中文', english: 'Chinese', flag: 'cn' },
+  { code: 'ko', tag: 'ko', name: '한국어', english: 'Korean', flag: 'kr' },
+  { code: 'th', tag: 'th', name: 'ไทย', english: 'Thai', flag: 'th' },
+  { code: 'fr', tag: 'fr', name: 'Français', english: 'French', flag: 'fr' },
+  { code: 'de', tag: 'de', name: 'Deutsch', english: 'German', flag: 'de' },
+  { code: 'it', tag: 'it', name: 'Italiano', english: 'Italian', flag: 'it' },
+];
+export const DEFAULT_LANG = 'ja';
+const KEY = 'mai-lang';
+
+// Scripts for which the site's own fonts have no glyphs.
+const FONTS = {
+  zh: 'family=Noto+Serif+SC:wght@500;600&family=Noto+Sans+SC:wght@400;500',
+  ko: 'family=Noto+Serif+KR:wght@500;600&family=Noto+Sans+KR:wght@400;500',
+  th: 'family=Noto+Serif+Thai:wght@400;500&family=Noto+Sans+Thai:wght@400;500',
 };
-const pageMeta = () => META[document.body.dataset.page] ?? META.home;
+
+const dictionaries = import.meta.glob('./i18n/*.json', { import: 'default' });
+let dict = {};
+
+export const langInfo = (code) => LANGS.find((l) => l.code === code);
+const valid = (code) => !!langInfo(code);
 
 export function getLang() {
-  return document.documentElement.lang === 'en' ? 'en' : 'ja';
+  const tag = document.documentElement.lang;
+  return LANGS.find((l) => l.tag === tag)?.code ?? DEFAULT_LANG;
 }
 
-export function setLang(lang, { persist = true } = {}) {
-  const root = document.documentElement;
-  root.lang = lang;
-  const meta = pageMeta()[lang];
-  document.title = meta.title;
-  document.querySelector('meta[name="description"]')?.setAttribute('content', meta.description);
-  document.querySelectorAll('[data-set-lang]').forEach((btn) => {
-    btn.setAttribute('aria-pressed', String(btn.dataset.setLang === lang));
+export function storedLang() {
+  try {
+    const code = localStorage.getItem(KEY);
+    return valid(code) ? code : null;
+  } catch {
+    return null;
+  }
+}
+
+/** The browser's preferred language if Mai's site speaks it, otherwise Japanese. */
+export function deviceLang() {
+  for (const pref of navigator.languages ?? [navigator.language]) {
+    const code = String(pref).toLowerCase().split(/[-_]/)[0];
+    if (valid(code)) return code;
+  }
+  return DEFAULT_LANG;
+}
+
+/** Text for a key in the active language (for strings built in JavaScript). */
+export const t = (key) => dict[key] ?? key;
+
+/** Fill every [data-t] inside root from the active dictionary. */
+export function translate(root = document) {
+  root.querySelectorAll('[data-t]').forEach((el) => {
+    const value = dict[el.dataset.t];
+    if (value != null && el.innerHTML !== value) el.innerHTML = value;
   });
+}
+
+function loadFonts(code) {
+  if (!FONTS[code] || document.querySelector(`link[data-font="${code}"]`)) return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = `https://fonts.googleapis.com/css2?${FONTS[code]}&display=swap`;
+  link.dataset.font = code;
+  document.head.append(link);
+}
+
+export async function setLang(code, { persist = true } = {}) {
+  if (!valid(code)) code = DEFAULT_LANG;
+  loadFonts(code);
+  try {
+    dict = await dictionaries[`./i18n/${code}.json`]();
+  } catch {
+    dict = {};
+  }
+  const root = document.documentElement;
+  root.lang = langInfo(code).tag;
+  translate();
+  const page = document.body.dataset.page ?? 'home';
+  if (dict[`meta-${page}-title`]) document.title = dict[`meta-${page}-title`];
+  document.querySelector('meta[name="description"]')?.setAttribute('content', dict[`meta-${page}-desc`] ?? '');
   if (persist) {
     try {
-      localStorage.setItem('mai-lang', lang);
+      localStorage.setItem(KEY, code);
     } catch {}
   }
-  document.dispatchEvent(new CustomEvent('langchange', { detail: { lang } }));
+  root.classList.remove('i18n-pending');
+  document.dispatchEvent(new CustomEvent('langchange', { detail: { lang: code } }));
 }
 
 export function initLang() {
-  setLang(getLang(), { persist: false });
-  document.querySelectorAll('[data-set-lang]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      if (btn.dataset.setLang !== getLang()) setLang(btn.dataset.setLang);
-    });
-  });
+  return setLang(getLang(), { persist: false });
 }

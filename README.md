@@ -20,6 +20,18 @@ Shared markup lives in `src/partials/` (head, header, footer, sash, band, cta) a
 `vite.config.js`: `<!-- partial:header -->` pulls in `src/partials/header.html`, `{{root}}` becomes the relative path
 home, and the nav link matching `<body data-page>` gets `aria-current="page"`. New pages go in `PAGES` in `vite.config.js`.
 
+## Welcome portal, languages and sound
+
+- **Portal** (`src/portal.js`): the first page of a visit opens on "Sound on?" (big Yes, small No), then a language
+  picker that suggests the device's language and picks it after 5 seconds (Japanese if the device's language isn't one of
+  the eight). Shown once per browser session; `?portal=off` skips it, `?lang=fr` (etc.) presets the language.
+- **Languages** (`src/lang.js`, `src/i18n/*.json`): ja, en, zh (Simplified), ko, th, fr, de, it. Japanese is written in
+  the HTML and is the default; every translatable element has `data-t="key"` and the active dictionary fills it. Page
+  titles/descriptions are `meta-<page>-title/desc`. Chinese, Korean and Thai load Noto fonts only when chosen.
+  The non-Japanese translations were written by Claude and should be checked by native speakers before launch.
+- **Sound** (`src/sound.js`): synthesised with Web Audio, no audio files: ambient drone and singing bowls, taps, sash
+  whooshes, the map flight, the Yu-fai fire crackle. Header speaker toggles it; the choice is remembered.
+
 ## Stack
 
 - **Vite** — dev server and multi-page build (`base: './'`, so it works under `/mai-website/`).

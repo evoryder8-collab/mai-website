@@ -3,14 +3,19 @@ import { initDirections } from './directions.js';
 import { initLang, getLang } from './lang.js';
 import { initNav } from './nav.js';
 import { initMotion, ScrollTrigger } from './motion.js';
+import { entered, initPortal } from './portal.js';
 import { initSash } from './sash.js';
+import { initSound } from './sound.js';
 import { initVideo } from './video.js';
 
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const welcoming = document.documentElement.classList.contains('portal-pending');
 
 initLang();
-const { lenis } = initMotion({ reduceMotion });
+const { lenis, playIntro } = initMotion({ reduceMotion, deferIntro: welcoming });
 initNav({ lenis });
+initSound();
+initPortal({ lenis, reduceMotion, onEnter: playIntro });
 initSash({ lenis, reduceMotion });
 initVideo({ reduceMotion });
 initButtons({ reduceMotion });
@@ -40,7 +45,7 @@ if (canvas) {
   );
 }
 
-// MapLibre (Visit page): loaded when the map comes near.
+// MapLibre (Visit page): loaded when the map comes near; it flies in once the portal has gone.
 const mapEl = document.querySelector('[data-map]');
 if (mapEl) {
   const io = new IntersectionObserver(
@@ -48,7 +53,7 @@ if (mapEl) {
       if (!entry.isIntersecting) return;
       io.disconnect();
       import('./map.js')
-        .then(({ initMap }) => initMap(mapEl, { lang: getLang(), reduceMotion }))
+        .then(({ initMap }) => initMap(mapEl, { lang: getLang(), reduceMotion, entered }))
         .catch(() => mapEl.classList.add('is-fallback'));
     },
     { rootMargin: '800px 0px' },

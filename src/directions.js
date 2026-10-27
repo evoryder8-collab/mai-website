@@ -2,6 +2,7 @@
 // as the AusMC and Lume Wellness sites. Any [data-directions] element opens it (links keep
 // their href as a no-JS fallback), and so does the map pin (the "mai:directions" event).
 import { APPLE as APPLE_LOGO, GOOGLE_MAPS as GOOGLE_MAPS_LOGO } from './brand-maps.js';
+import { translate } from './lang.js';
 import { gsap } from './motion.js';
 
 const ADDRESS = '茨城県つくば市柴崎68-17';
@@ -16,10 +17,10 @@ function build() {
   dialog.setAttribute('aria-labelledby', 'choice-title');
   dialog.innerHTML = `
     <div class="choice__panel">
-      <button class="choice__close" type="button" data-close><span class="visually-hidden"><span data-l="ja">閉じる</span><span data-l="en">Close</span></span><span class="choice__x" aria-hidden="true"></span></button>
-      <p class="choice__eyebrow">Memories Spa <i></i> <span data-l="ja">つくば</span><span data-l="en">Tsukuba</span></p>
-      <h2 class="choice__title" id="choice-title"><span data-l="ja">どの地図アプリで<br>開きますか？</span><span data-l="en">Which maps app would<br>you like to use?</span></h2>
-      <p class="choice__addr"><span data-l="ja">${ADDRESS}</span><span data-l="en">68-17 Shibasaki, Tsukuba, Ibaraki</span></p>
+      <button class="choice__close" type="button" data-close><span class="visually-hidden" data-t="close"></span><span class="choice__x" aria-hidden="true"></span></button>
+      <p class="choice__eyebrow">Memories Spa <i></i> <span data-t="tsukuba"></span></p>
+      <h2 class="choice__title" id="choice-title" data-t="which-maps-app"></h2>
+      <p class="choice__addr" data-t="68-17-shibasaki-tsukuba-ibaraki"></p>
       <div class="choice__options">
         <a class="choice__option" href="${GOOGLE}" target="_blank" rel="noopener" data-option>
           <span class="choice__brand choice__brand--google" aria-hidden="true">${GOOGLE_MAPS_LOGO}</span>
@@ -27,11 +28,13 @@ function build() {
         </a>
         <a class="choice__option" href="${APPLE}" target="_blank" rel="noopener" data-option>
           <span class="choice__brand choice__brand--apple" aria-hidden="true">${APPLE_LOGO}</span>
-          <strong><span data-l="ja">Apple マップ</span><span data-l="en">Apple Maps</span></strong>${ARROW}
+          <strong data-t="apple-maps"></strong>${ARROW}
         </a>
       </div>
-      <button class="choice__cancel" type="button" data-close><span data-l="ja">キャンセル</span><span data-l="en">Cancel</span></button>
+      <button class="choice__cancel" type="button" data-close data-t="cancel"></button>
     </div>`;
+  translate(dialog);
+  document.addEventListener('langchange', () => translate(dialog));
   document.body.append(dialog);
   return dialog;
 }
@@ -65,6 +68,7 @@ export function initDirections({ lenis, reduceMotion }) {
     opener = trigger;
     lenis?.stop();
     dialog.showModal();
+    document.dispatchEvent(new CustomEvent('mai:chooser'));
     if (reduceMotion) return;
     const panel = dialog.querySelector('.choice__panel');
     gsap.fromTo(panel, { y: 48, scale: 0.9, autoAlpha: 0 }, { y: 0, scale: 1, autoAlpha: 1, duration: 0.8, ease: 'back.out(1.5)' });

@@ -5,6 +5,7 @@
 import { AttributionControl, Map as MapLibreMap, Marker, NavigationControl, setWorkerUrl } from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { t } from './lang.js';
 import { gsap, ScrollTrigger } from './motion.js';
 
 // MapLibre 6 looks for its worker next to its own file, which Vite moves; point it at Vite's build instead.
@@ -236,14 +237,15 @@ function circle([lng, lat], r) {
   return { type: 'Feature', properties: {}, geometry: { type: 'Polygon', coordinates: [ring] } };
 }
 
+// Place names in the visitor's language where OpenMapTiles has them, then English, then local.
 const nameField = (lang) =>
   lang === 'ja'
     ? ['coalesce', ['get', 'name:ja'], ['get', 'name']]
-    : ['coalesce', ['get', 'name:en'], ['get', 'name_en'], ['get', 'name:latin'], ['get', 'name']];
+    : ['coalesce', ['get', `name:${lang}`], ['get', 'name:en'], ['get', 'name_en'], ['get', 'name:latin'], ['get', 'name']];
 
 const isNameLabel = (field) => field && JSON.stringify(field).includes('name');
 
-export async function initMap(container, { lang, reduceMotion }) {
+export async function initMap(container, { lang, reduceMotion, entered = Promise.resolve() }) {
   let style;
   try {
     style = await fetch(STYLE).then((r) => (r.ok ? r.json() : Promise.reject(r.status)));
@@ -313,15 +315,19 @@ export async function initMap(container, { lang, reduceMotion }) {
     // "moveend", and the orbit would otherwise cancel the new flight.
     const token = ++flight;
     map.flyTo({ ...ARRIVAL(), duration: first ? 8000 : 6000, curve: first ? 1.7 : 1.5, essential: true });
-    map.once('moveend', () => token === flight && startOrbit());
+    document.dispatchEvent(new CustomEvent('mai:fly'));
+    map.once('moveend', () => {
+      if (token !== flight) return;
+      document.dispatchEvent(new CustomEvent('mai:arrive'));
+      startOrbit();
+    });
   };
 
   // "Fly in again": back out to Japan and travel down once more.
   const replay = document.createElement('button');
   replay.type = 'button';
   replay.className = 'map-replay';
-  replay.innerHTML =
-    '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span data-l="ja">もう一度</span><span data-l="en">Fly in again</span>';
+  replay.innerHTML = `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span data-t="fly-in-again">${t('fly-in-again')}</span>`;
   replay.addEventListener('click', () => {
     map.jumpTo(JAPAN());
     flyIn(false);
@@ -332,8 +338,10 @@ export async function initMap(container, { lang, reduceMotion }) {
     container.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
     if (reduceMotion) return;
     container.append(replay);
-    // A moment on the globe in space, then the journey down.
-    ScrollTrigger.create({ trigger: container, start: 'top 70%', once: true, onEnter: () => gsap.delayedCall(1.4, () => flyIn(true)) });
+    // Once the welcome portal has gone: a moment on the globe in space, then the journey down.
+    entered.then(() =>
+      ScrollTrigger.create({ trigger: container, start: 'top 70%', once: true, onEnter: () => gsap.delayedCall(1.4, () => flyIn(true)) }),
+    );
   });
 
   document.addEventListener('langchange', (e) => {

@@ -10,8 +10,9 @@ gsap.registerPlugin(ScrollTrigger, SplitText);
 
 export { gsap, ScrollTrigger };
 
-export function initMotion({ reduceMotion }) {
+export function initMotion({ reduceMotion, deferIntro = false }) {
   let lenis = null;
+  let introTimeline = null;
 
   if (!reduceMotion) {
     lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 0.95 });
@@ -24,8 +25,11 @@ export function initMotion({ reduceMotion }) {
   initHeader(lenis);
 
   if (!reduceMotion) {
-    intro();
+    // Behind the welcome portal the intro waits, and plays as the portal opens.
+    introTimeline = intro();
+    if (deferIntro) introTimeline.pause();
     floatCards();
+    immersiveFilm();
     reveals();
     parallax();
     fireGlow();
@@ -42,7 +46,7 @@ export function initMotion({ reduceMotion }) {
   }
 
   document.documentElement.classList.add('ready');
-  return { lenis };
+  return { lenis, playIntro: () => introTimeline?.play() };
 }
 
 function initAnchors(lenis) {
@@ -95,6 +99,47 @@ function intro() {
   // Visit: the map panel rises in like the AusMC venue map.
   const panel = document.querySelector('[data-map-panel]');
   if (panel) tl.from(panel, { y: 80, scale: 0.94, autoAlpha: 0, duration: 1.6, clearProps: 'transform' }, 0.25);
+  return tl;
+}
+
+// Phones: scrolling onto the award film, it grows from its card to fill the whole
+// screen, holds while the ceremony plays, then lets go. (Browsers only allow true
+// fullscreen from a tap; the film's own button does that.)
+function immersiveFilm() {
+  const figure = document.querySelector('[data-film]');
+  const frame = figure?.querySelector('.video-frame');
+  if (!frame) return;
+  matchMedia('(max-width: 759px)').addEventListener('change', () => ScrollTrigger.refresh());
+  const mm = gsap.matchMedia();
+  mm.add('(max-width: 759px)', () => {
+    let immersed = false;
+    const announce = (on) => {
+      if (on === immersed) return;
+      immersed = on;
+      figure.classList.toggle('is-immersed', on);
+      document.dispatchEvent(new CustomEvent('mai:film', { detail: { immersive: on } }));
+    };
+    const tl = gsap.timeline({
+      defaults: { ease: 'power2.inOut' },
+      scrollTrigger: {
+        trigger: figure,
+        start: 'top top',
+        end: '+=140%',
+        pin: true,
+        scrub: 0.5,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => announce(self.progress > 0.32 && self.progress < 0.97),
+        onLeave: () => announce(false),
+        onLeaveBack: () => announce(false),
+      },
+    });
+    tl.to(frame, { width: () => innerWidth, height: () => innerHeight, borderRadius: 0, boxShadow: 'none', duration: 1 })
+      .to(figure.querySelector('.film__backdrop'), { autoAlpha: 1, duration: 1 }, 0)
+      .to(figure.querySelector('figcaption'), { autoAlpha: 0, y: -20, duration: 0.4 }, 0)
+      .to({}, { duration: 1.6 })
+      .to(frame, { scale: 0.92, borderRadius: 30, duration: 0.6 });
+    return () => announce(false);
+  });
 }
 
 // Glass photo cards hang in 3D: a slow float, and on desktop a tilt toward the pointer

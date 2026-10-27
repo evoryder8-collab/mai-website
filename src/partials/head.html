@@ -8,19 +8,25 @@
 <meta name="twitter:card" content="summary_large_image">
 
 <script>
-  // Pick the language before first paint so the page never flashes the wrong one.
+  // Before first paint: the language (a ?lang= link, then the visitor's earlier choice,
+  // otherwise Japanese) and whether this is the first page of the visit, which opens with
+  // the sound and language portal (src/portal.js). ?portal=off skips it, for testing.
   (function () {
-    var d = document.documentElement, l;
+    var d = document.documentElement, q = new URLSearchParams(location.search), l, entered;
+    var tags = { ja: 'ja', en: 'en', zh: 'zh-Hans', ko: 'ko', th: 'th', fr: 'fr', de: 'de', it: 'it' };
     d.classList.add('js');
-    try { l = new URLSearchParams(location.search).get('lang') || localStorage.getItem('mai-lang'); } catch (e) {}
-    if (l !== 'ja' && l !== 'en') {
-      var langs = navigator.languages || [navigator.language || ''];
-      l = 'en';
-      for (var i = 0; i < langs.length; i++) if (/^ja/i.test(langs[i])) { l = 'ja'; break; }
-    }
-    d.lang = l;
+    try {
+      l = q.get('lang') || localStorage.getItem('mai-lang');
+      if (q.get('lang') && tags[l]) localStorage.setItem('mai-lang', l);
+      if (q.get('portal') === 'off') sessionStorage.setItem('mai-entered', '1');
+      entered = sessionStorage.getItem('mai-entered');
+    } catch (e) { entered = '1'; }
+    if (!tags[l]) l = 'ja';
+    d.lang = tags[l];
+    if (l !== 'ja') d.classList.add('i18n-pending');
+    if (!entered) d.classList.add('portal-pending');
     // If the scripts never arrive, show everything anyway.
-    setTimeout(function () { d.classList.add('ready'); }, 2500);
+    setTimeout(function () { d.classList.add('ready'); d.classList.remove('i18n-pending', 'portal-pending'); }, 4000);
   })();
 </script>
 
