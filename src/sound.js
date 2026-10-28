@@ -1,6 +1,7 @@
 // Sound: her background music ("Weightless Clouds 2", looping at 40% to start with, picking
-// up on each page where the last one left off), soft synthesised sounds for touches,
-// flings and the map flight, and Latte's and Mugi's barks, all through one Web Audio mix.
+// up on each page where the last one left off), recorded effects for touches, choices, the
+// sash, the map flight and the bowl (CC0 recordings from Freesound, found through Openverse;
+// credits in the README), and Latte's and Mugi's barks, all through one Web Audio mix.
 // Nothing plays until the visitor says yes (portal or header speaker); the choice is
 // remembered. On later pages browsers only allow audio after a tap, so the music fades in
 // on the first one. iPhones let one thing play sound at a time: the award film pauses the
@@ -8,17 +9,29 @@
 // it was.
 
 import musicUrl from './assets/mai-music.mp3';
+import bowlUrl from './assets/sfx-bowl.mp3';
+import chimeUrl from './assets/sfx-chime.mp3';
+import flightUrl from './assets/sfx-flight.mp3';
+import hoverUrl from './assets/sfx-hover.mp3';
+import swishUrl from './assets/sfx-swish.mp3';
+import tapUrl from './assets/sfx-tap.mp3';
+import tickUrl from './assets/sfx-tick.mp3';
 
 const KEY = 'mai-sound';
 const MUSIC_VOLUME = 0.4;
 const MUSIC_AT = 'mai-music-at';
-const PENTATONIC = [220, 246.94, 277.18, 329.63, 369.99, 440];
-const BOWL_PARTIALS = [
-  [1, 1],
-  [2.76, 0.5],
-  [5.4, 0.25],
-  [8.93, 0.12],
-];
+// Each effect and how loud it plays. The files share one peak level; these put them where the
+// old synthesised sounds sat, under the music (about -26 LUFS): the bowl and chime a few dB
+// below it, a tap about 10, the countdown tick and the hover ting quieter still.
+const SFX = {
+  tap: [tapUrl, 0.3],
+  hover: [hoverUrl, 0.055],
+  chime: [chimeUrl, 0.36],
+  tick: [tickUrl, 0.06],
+  bowl: [bowlUrl, 0.19],
+  swish: [swishUrl, 0.35],
+  flight: [flightUrl, 0.1],
+};
 
 let enabled = (() => {
   try {
@@ -31,8 +44,6 @@ let ctx = null;
 let master;
 let ambientBus;
 let sfxBus;
-let reverb;
-let noise;
 let music = null;
 let startingOver = false;
 let ducked = false;
@@ -41,6 +52,7 @@ let analyser = null;
 let meter = null;
 const listeners = new Set();
 const recordings = new Map();
+const decoded = new Map();
 
 function graph() {
   if (ctx) return ctx;
@@ -62,21 +74,6 @@ function graph() {
   sfxBus = ctx.createGain();
   ambientBus.connect(master);
   sfxBus.connect(master);
-  // A soft room: decaying stereo noise as the impulse response.
-  reverb = ctx.createConvolver();
-  const len = ctx.sampleRate * 3.2;
-  const ir = ctx.createBuffer(2, len, ctx.sampleRate);
-  for (let c = 0; c < 2; c++) {
-    const d = ir.getChannelData(c);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len) ** 3.2;
-  }
-  reverb.buffer = ir;
-  const wet = ctx.createGain();
-  wet.gain.value = 0.55;
-  reverb.connect(wet).connect(master);
-  noise = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-  const n = noise.getChannelData(0);
-  for (let i = 0; i < n.length; i++) n[i] = Math.random() * 2 - 1;
   document.addEventListener('visibilitychange', () => {
     if (!enabled) return;
     if (document.hidden) {
@@ -91,12 +88,6 @@ function graph() {
 }
 
 const now = () => ctx.currentTime;
-
-function envelope(gain, peak, attack, decay, at = now()) {
-  gain.gain.setValueAtTime(0.0001, at);
-  gain.gain.exponentialRampToValueAtTime(peak, at + attack);
-  gain.gain.exponentialRampToValueAtTime(0.0001, at + attack + decay);
-}
 
 // The music streams from an <audio> element into the mix, so the master fade, the film's
 // ducking and the background's response to sound all apply to it.
@@ -150,34 +141,35 @@ function wake() {
       if (!enabled || ducked) return;
       master.gain.setTargetAtTime(1, now(), 0.6);
       if (!music || music.el.paused) startMusic();
+      preloadEffects();
     })
     .catch(() => {});
 }
 
-function bowl({ freq = PENTATONIC[Math.floor(Math.random() * PENTATONIC.length)], gain = 0.06, pan = Math.random() - 0.5 } = {}) {
-  if (!ready()) return;
+const preloadEffects = () => Object.values(SFX).forEach(([url]) => sound.load(url));
+
+function voice(buffer, { gain, pan = 0, rate = 1 }) {
+  const src = ctx.createBufferSource();
+  const g = ctx.createGain();
   const p = ctx.createStereoPanner();
+  src.buffer = buffer;
+  src.playbackRate.value = rate;
+  g.gain.value = gain;
   p.pan.value = pan;
-  p.connect(sfxBus);
-  p.connect(reverb);
-  BOWL_PARTIALS.forEach(([ratio, amp], i) => {
-    [0, 1.3].forEach((beat) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.frequency.value = freq * ratio + beat;
-      envelope(g, gain * amp * 0.5, 0.006, 7 - i * 1.4);
-      o.connect(g).connect(p);
-      o.start();
-      o.stop(now() + 7.5);
-    });
-  });
+  src.connect(g).connect(p).connect(sfxBus);
+  src.start();
 }
 
-function noiseSource() {
-  const src = ctx.createBufferSource();
-  src.buffer = noise;
-  src.loop = true;
-  return src;
+// The effects are fetched as soon as sound is on. One that isn't ready yet (the portal's first
+// chime) may still play if it arrives within half a second; later than that it's dropped,
+// as a touch sound that comes late is worse than none.
+function effect(name, { level = 1, pan = 0, rate = 1 } = {}) {
+  if (!ready()) return;
+  const [url, gain] = SFX[name];
+  const play = (buffer) => voice(buffer, { gain: gain * level, pan, rate });
+  if (decoded.has(url)) return play(decoded.get(url));
+  const asked = performance.now();
+  sound.load(url).then((buffer) => buffer && ready() && performance.now() - asked < 500 && play(buffer));
 }
 
 const ready = () => enabled && ctx && ctx.state === 'running';
@@ -198,6 +190,7 @@ export const sound = {
       ctx.resume().then(() => {
         master.gain.setTargetAtTime(1, now(), 0.4);
         startMusic();
+        preloadEffects();
       });
     } else if (ctx) {
       master.gain.setTargetAtTime(0, now(), 0.25);
@@ -219,68 +212,48 @@ export const sound = {
     return Math.min(1, Math.sqrt(sum / meter.length) * 6);
   },
 
-  /** Wooden "tok" for touches. */
+  /** A soft wooden tap for touches. */
   tap() {
-    if (!ready()) return;
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(620, now());
-    o.frequency.exponentialRampToValueAtTime(300, now() + 0.08);
-    envelope(g, 0.12, 0.004, 0.11);
-    o.connect(g).connect(sfxBus);
-    g.connect(reverb);
-    o.start();
-    o.stop(now() + 0.2);
+    effect('tap', { rate: 0.96 + Math.random() * 0.08 });
   },
 
-  /** A faint glass tink when the pointer finds something (desktop). */
+  /** A faint glass ting when the pointer finds something (desktop). */
   hover() {
-    if (!ready() || performance.now() - lastHover < 90) return;
+    if (performance.now() - lastHover < 90) return;
     lastHover = performance.now();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.frequency.value = 1760 + Math.random() * 220;
-    envelope(g, 0.018, 0.003, 0.14);
-    o.connect(g).connect(sfxBus);
-    o.start();
-    o.stop(now() + 0.2);
+    effect('hover', { rate: 0.94 + Math.random() * 0.14, pan: (Math.random() - 0.5) * 0.5 });
   },
 
-  /** Two-note bell: a choice made. */
+  /** A small bell: a choice made. */
   chime() {
-    if (!ready()) return;
-    [1318.5, 1975.5].forEach((f, i) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.frequency.value = f;
-      envelope(g, 0.045, 0.005, 1.4, now() + i * 0.09);
-      o.connect(g).connect(sfxBus);
-      g.connect(reverb);
-      o.start(now() + i * 0.09);
-      o.stop(now() + 1.8);
-    });
+    effect('chime');
   },
 
   /** Countdown tick. */
   tick() {
-    if (!ready()) return;
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.frequency.value = 2100;
-    envelope(g, 0.03, 0.002, 0.035);
-    o.connect(g).connect(sfxBus);
-    o.start();
-    o.stop(now() + 0.08);
+    effect('tick');
   },
 
-  bowl,
+  /** The singing bowl: her line in the portal, and the map arriving at the salon. */
+  bowl() {
+    effect('bowl');
+  },
 
   /** Fetch and decode a recording once, ahead of time (only once sound is on). */
   load(url) {
     if (!enabled || !graph()) return Promise.resolve(null);
     if (!recordings.has(url)) {
-      recordings.set(url, fetch(url).then((r) => r.arrayBuffer()).then((b) => ctx.decodeAudioData(b)).catch(() => null));
+      recordings.set(
+        url,
+        fetch(url)
+          .then((r) => r.arrayBuffer())
+          .then((b) => ctx.decodeAudioData(b))
+          .then((buffer) => {
+            decoded.set(url, buffer);
+            return buffer;
+          })
+          .catch(() => null),
+      );
     }
     return recordings.get(url);
   },
@@ -288,39 +261,7 @@ export const sound = {
   /** Play a recording, placed a little left or right. */
   play(url, { gain = 0.55, pan = 0 } = {}) {
     if (!ready()) return;
-    sound.load(url).then((buffer) => {
-      if (!buffer || !ready()) return;
-      const src = ctx.createBufferSource();
-      const g = ctx.createGain();
-      const p = ctx.createStereoPanner();
-      src.buffer = buffer;
-      g.gain.value = gain;
-      p.pan.value = pan;
-      src.connect(g).connect(p).connect(sfxBus);
-      src.start();
-    });
-  },
-
-  /** Air moving: filtered noise sweeping between two frequencies. */
-  whoosh({ dur = 0.6, from = 400, to = 2200, gain = 0.08 } = {}) {
-    if (!ready()) return;
-    const src = noiseSource();
-    const f = ctx.createBiquadFilter();
-    const g = ctx.createGain();
-    const p = ctx.createStereoPanner();
-    f.type = 'bandpass';
-    f.Q.value = 0.9;
-    f.frequency.setValueAtTime(from, now());
-    f.frequency.exponentialRampToValueAtTime(to, now() + dur);
-    g.gain.setValueAtTime(0.0001, now());
-    g.gain.exponentialRampToValueAtTime(gain, now() + dur * 0.4);
-    g.gain.exponentialRampToValueAtTime(0.0001, now() + dur);
-    p.pan.setValueAtTime(-0.4, now());
-    p.pan.linearRampToValueAtTime(0.4, now() + dur);
-    src.connect(f).connect(g).connect(p).connect(sfxBus);
-    g.connect(reverb);
-    src.start();
-    src.stop(now() + dur + 0.1);
+    sound.load(url).then((buffer) => buffer && ready() && voice(buffer, { gain, pan }));
   },
 
   /** Back to how a visit begins: silent until the visitor says yes, the music from the top. */
@@ -361,8 +302,12 @@ export function initSound() {
       if (el && !el.contains(e.relatedTarget)) sound.hover();
     });
   }
-  document.addEventListener('mai:fling', (e) => sound.whoosh({ dur: 0.5, from: 300, to: 1800, gain: Math.min(0.12, Math.abs(e.detail.speed) / 9000) }));
-  document.addEventListener('mai:fly', () => sound.whoosh({ dur: 5.5, from: 120, to: 900, gain: 0.07 }));
-  document.addEventListener('mai:arrive', () => sound.bowl({ freq: 220, gain: 0.08, pan: 0 }));
+  // The sash: the harder it's flung, the louder and brighter it swishes, toward where it went.
+  document.addEventListener('mai:fling', (e) => {
+    const speed = Math.abs(e.detail.speed);
+    effect('swish', { level: Math.min(1, speed / 1100), rate: 0.9 + Math.min(0.25, speed / 8000), pan: -Math.sign(e.detail.speed) * 0.3 });
+  });
+  document.addEventListener('mai:fly', () => effect('flight'));
+  document.addEventListener('mai:arrive', () => sound.bowl());
   document.addEventListener('mai:chooser', () => sound.chime());
 }

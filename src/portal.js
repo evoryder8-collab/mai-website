@@ -232,7 +232,7 @@ export function initPortal({ lenis, reduceMotion, onEnter }) {
           <span class="portal__line portal__line--sub"><span>${phrases(sub)}</span></span>
         </p>`, code);
       dialog.classList.add('is-statement');
-      if (sound.on) sound.bowl({ freq: 220, gain: 0.07, pan: 0 });
+      if (sound.on) sound.bowl();
       let done = false;
       const finish = () => {
         if (done) return;

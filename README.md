@@ -31,8 +31,24 @@ home, and the nav link matching `<body data-page>` gets `aria-current="page"`. N
   titles/descriptions are `meta-<page>-title/desc`. Chinese, Korean and Thai load Noto fonts only when chosen.
   The non-Japanese translations were written by Claude and should be checked by native speakers before launch.
 - **Sound** (`src/sound.js`): one Web Audio mix. Her background music (`src/assets/mai-music.mp3`, 40%, resumes across
-  pages), Latte's and Mugi's barks, and synthesised taps, sash whooshes, bowls and the map flight. Header speaker
+  pages), Latte's and Mugi's barks, and recorded effects (`src/assets/sfx-*.mp3`, credits below). Header speaker
   toggles it; the choice is remembered.
+
+### Sound effect credits
+
+All CC0 1.0 (public domain: free for commercial use, no attribution required), from [Freesound](https://freesound.org),
+found through the [Openverse](https://openverse.org) API. Originals are kept in `media-src/sfx/` under their Freesound
+ids; `npm run media -- sfx` cuts and levels them.
+
+| Effect | Used for | Recording |
+| --- | --- | --- |
+| `sfx-tap` | touching buttons and links | [FrogBlock05](https://freesound.org/people/Jagadamba/sounds/219162/) by Jagadamba |
+| `sfx-hover` | the pointer finding one (desktop) | [Ding](https://freesound.org/people/LanooskiProductions/sounds/394795/) by LanooskiProductions |
+| `sfx-chime` | a choice made (portal, directions) | [wind chimes - single 04](https://freesound.org/people/Anthousai/sounds/398496/) by Anthousai |
+| `sfx-tick` | the portal's language countdown | [clock-tick-01](https://freesound.org/people/pbimal/sounds/534094/) by pbimal |
+| `sfx-bowl` | her line in the portal, the map arriving | [singing bowl - single strike 4](https://freesound.org/people/s-light/sounds/411481/) by s-light |
+| `sfx-swish` | flinging the sash | [Foley_Whoosh_Clothes](https://freesound.org/people/Nox_Sound/sounds/495390/) by Nox_Sound |
+| `sfx-flight` | the map's flight to the salon | [gust of wind](https://freesound.org/people/Tony%20B%20kksm/sounds/80937/) by Tony B kksm |
 
 ## Stack
 
@@ -80,7 +96,8 @@ Originals go in `media-src/` (git-ignored: they carry camera/GPS metadata). Then
 npm run media
 ```
 
-writes resized AVIF/JPEG photos, the share image and the web MP4 + poster to `public/media/`, with metadata stripped.
+writes resized AVIF/JPEG photos, the share image and the web MP4 + poster to `public/media/`, and the sounds to
+`src/assets/`, with metadata stripped.
 Needs `ffmpeg` on the PATH.
 
 | Original | Web name |

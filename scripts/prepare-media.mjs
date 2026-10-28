@@ -1,10 +1,10 @@
 // Turns the originals in media-src/ into web-ready files in public/media/.
 // Run with `npm run media` after adding or replacing an original, or `npm run media -- dogs`
-// (photos, logo, og, video, dogs, barks, music) to redo just one group.
+// (photos, logo, og, video, dogs, barks, sfx, music) to redo just one group.
 // sharp drops EXIF/GPS metadata by default, and ffmpeg is told to do the same,
 // so nothing from the camera ends up in the public repo.
 import { mkdir } from 'node:fs/promises';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import sharp from 'sharp';
 
 const SRC = 'media-src';
@@ -73,6 +73,35 @@ if (run('barks')) {
       '-af', `atrim=start=${start}:duration=3,asetpts=PTS-STARTPTS,loudnorm=I=-19:TP=-2:LRA=11,afade=t=in:d=0.01,afade=t=out:st=1.8:d=1.2`,
       '-ac', '1', '-ar', '44100', '-c:a', 'libmp3lame', '-b:a', '96k', `src/assets/${name}.mp3`], { stdio: 'inherit' });
     console.log(`sound  ${file} -> src/assets/${name}.mp3`);
+  }
+}
+
+// The site's sound effects (sound.js): CC0 recordings from Freesound, found through Openverse
+// (credits in the README), kept in media-src/sfx/ under their Freesound ids. Each is cut to
+// its one event — [start, length, fade out] in seconds — cleared of DC and rumble, faded and
+// given 10 ms of silence in front so it never clicks, and levelled to the same peak (with
+// headroom for the MP3's overshoot); sound.js sets how loud each one plays.
+const SFX = {
+  tap: ['219162', 0, 0.3, 0.12], // Jagadamba, "FrogBlock05": a soft wooden tok
+  hover: ['394795', 0.045, 0.7, 0.4], // LanooskiProductions, "Ding": a small glass ting
+  chime: ['398496', 0, 3.2, 1.6], // Anthousai, "wind chimes - single 04": one chime
+  tick: ['534094', 0.025, 0.3, 0.12], // pbimal, "clock-tick-01": one clock tick
+  bowl: ['411481', 0.035, 8, 3], // s-light, "singing bowl - single strike 4"
+  swish: ['495390', 5.03, 0.85, 0.3], // Nox_Sound, "Foley_Whoosh_Clothes": the fifth swish
+  flight: ['80937', 0, 9.5, 2.5], // Tony B kksm, "gust of wind": swells to its peak at 5.5 s
+};
+if (run('sfx')) {
+  await mkdir('src/assets', { recursive: true });
+  for (const [name, [id, start, length, fadeOut]] of Object.entries(SFX)) {
+    const input = ['-ss', String(start), '-t', String(length), '-i', `${SRC}/sfx/${id}.mp3`];
+    const shape = `highpass=f=40,afade=t=in:d=0.004,afade=t=out:st=${(length - fadeOut).toFixed(3)}:d=${fadeOut},adelay=10:all=1`;
+    // Two passes: find the peak, then level it to -3 dBFS.
+    const probe = spawnSync('ffmpeg', ['-hide_banner', ...input, '-af', `${shape},volumedetect`, '-ac', '1', '-f', 'null', '-'], { encoding: 'utf8' }).stderr;
+    const peak = parseFloat(probe.match(/max_volume: (-?[\d.]+) dB/)?.[1] ?? '0');
+    execFileSync('ffmpeg', ['-v', 'error', '-y', ...input, '-map_metadata', '-1',
+      '-af', `${shape},volume=${(-3 - peak).toFixed(2)}dB`,
+      '-ac', '1', '-ar', '44100', '-c:a', 'libmp3lame', '-b:a', '96k', `src/assets/sfx-${name}.mp3`], { stdio: 'inherit' });
+    console.log(`sound  sfx/${id}.mp3 -> src/assets/sfx-${name}.mp3 (${(-3 - peak).toFixed(1)} dB)`);
   }
 }
 
