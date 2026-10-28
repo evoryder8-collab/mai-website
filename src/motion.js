@@ -33,6 +33,8 @@ export function initMotion({ reduceMotion, deferIntro = false }) {
     reveals();
     parallax();
     fireGlow();
+    flowLine();
+    pawTrail();
     document.addEventListener('langchange', () => ScrollTrigger.refresh());
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
 
@@ -218,11 +220,36 @@ function parallax() {
   const band = document.querySelector('[data-band]');
   if (band) {
     gsap.fromTo(
-      band,
+      band.querySelector('picture') ?? band,
       { yPercent: -8 },
       { yPercent: 8, ease: 'none', scrollTrigger: { trigger: band.parentElement, start: 'top bottom', end: 'bottom top', scrub: true } },
     );
   }
+}
+
+// Philosophy: the gold line joining her three words draws itself as you scroll past.
+function flowLine() {
+  const path = document.querySelector('[data-flow]');
+  if (!path) return;
+  gsap.fromTo(
+    path,
+    { strokeDashoffset: 1 },
+    { strokeDashoffset: 0, ease: 'none', scrollTrigger: { trigger: path.closest('.pillars'), start: 'top 80%', end: 'bottom 45%', scrub: true } },
+  );
+}
+
+// Dogs: the paw prints appear one after another, as if walking up through the section.
+function pawTrail() {
+  const trail = document.querySelector('[data-paws]');
+  if (!trail) return;
+  gsap.from(trail.children, {
+    autoAlpha: 0,
+    scale: 0.4,
+    duration: 0.7,
+    stagger: 0.16,
+    ease: 'back.out(2.2)',
+    scrollTrigger: { trigger: trail.parentElement, start: 'top 70%', once: true },
+  });
 }
 
 // "Staying by the fire": the glow leans toward the pointer.

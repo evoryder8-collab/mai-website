@@ -20,14 +20,27 @@ const COUNTDOWN = 5000;
 
 // The portal speaks before any dictionary is loaded, so its few lines live here.
 const COPY = {
-  ja: { role: 'タイ伝統マッサージ セラピスト', soundTitle: 'サウンドをオンにしますか？', soundCopy: '穏やかな音とともに、Mai の世界へ。右上のボタンでいつでもオフにできます。', yes: 'はい', recommended: 'おすすめ', no: '音なしで見る', choose: '言語を選択してください', auto: '日本語で始まります… {s}', paused: '自動選択を一時停止しました', pause: '一時停止', resume: '再開', device: 'お使いの端末の言語', close: '閉じる' },
-  en: { role: 'Thai Massage Therapist', soundTitle: 'Experience it with sound?', soundCopy: 'Gentle sound draws you into Mai’s world. Turn it off any time with the button at the top right.', yes: 'Yes', recommended: 'Recommended', no: 'Continue without sound', choose: 'Choose your language', auto: 'Continuing in English in {s}', paused: 'Automatic selection paused', pause: 'Pause', resume: 'Resume', device: 'Your device’s language', close: 'Close' },
-  zh: { role: '泰式传统按摩理疗师', soundTitle: '要开启声音吗？', soundCopy: '在柔和的声音中，走进 Mai 的世界。可随时用右上角的按钮关闭。', yes: '是', recommended: '推荐', no: '不开声音继续', choose: '请选择语言', auto: '{s} 秒后以简体中文继续', paused: '已暂停自动选择', pause: '暂停', resume: '继续', device: '您设备的语言', close: '关闭' },
-  ko: { role: '태국 전통 마사지 테라피스트', soundTitle: '소리를 켜시겠어요?', soundCopy: '은은한 소리와 함께 Mai의 세계로 들어가 보세요. 오른쪽 위 버튼으로 언제든지 끌 수 있어요.', yes: '네', recommended: '추천', no: '소리 없이 보기', choose: '언어를 선택해 주세요', auto: '{s}초 후 한국어로 계속합니다', paused: '자동 선택이 일시 정지되었습니다', pause: '일시 정지', resume: '계속', device: '기기 언어', close: '닫기' },
-  th: { role: 'นักบำบัดนวดแผนไทย', soundTitle: 'เปิดเสียงไหม?', soundCopy: 'เสียงที่นุ่มนวลจะพาคุณเข้าสู่โลกของ Mai ปิดได้ทุกเมื่อด้วยปุ่มมุมขวาบน', yes: 'ใช่', recommended: 'แนะนำ', no: 'ดูต่อโดยไม่เปิดเสียง', choose: 'เลือกภาษา', auto: 'จะใช้ภาษาไทยใน {s} วินาที', paused: 'หยุดการเลือกอัตโนมัติชั่วคราว', pause: 'หยุดชั่วคราว', resume: 'ทำต่อ', device: 'ภาษาของอุปกรณ์คุณ', close: 'ปิด' },
-  fr: { role: 'Thérapeute en massage thaï', soundTitle: 'Avec le son ?', soundCopy: 'Un son tout en douceur pour entrer dans l’univers de Mai. Coupez-le à tout moment avec le bouton en haut à droite.', yes: 'Oui', recommended: 'Recommandé', no: 'Continuer sans le son', choose: 'Choisissez votre langue', auto: 'Suite en français dans {s} s', paused: 'Sélection automatique en pause', pause: 'Pause', resume: 'Reprendre', device: 'Langue de votre appareil', close: 'Fermer' },
-  de: { role: 'Thai-Massage-Therapeutin', soundTitle: 'Mit Ton erleben?', soundCopy: 'Sanfte Klänge führen Sie in Mais Welt. Mit der Taste oben rechts schalten Sie den Ton jederzeit aus.', yes: 'Ja', recommended: 'Empfohlen', no: 'Ohne Ton fortfahren', choose: 'Wählen Sie Ihre Sprache', auto: 'Weiter auf Deutsch in {s} s', paused: 'Automatische Auswahl pausiert', pause: 'Pausieren', resume: 'Fortsetzen', device: 'Sprache Ihres Geräts', close: 'Schließen' },
-  it: { role: 'Terapista di massaggio thai', soundTitle: 'Con l’audio?', soundCopy: 'Suoni delicati per entrare nel mondo di Mai. Puoi disattivarli in qualsiasi momento con il pulsante in alto a destra.', yes: 'Sì', recommended: 'Consigliato', no: 'Continua senza audio', choose: 'Scegli la lingua', auto: 'Si continua in italiano tra {s} s', paused: 'Selezione automatica in pausa', pause: 'Pausa', resume: 'Riprendi', device: 'Lingua del tuo dispositivo', close: 'Chiudi' },
+  ja: { role: 'からだ本来の流れを取り戻す', soundTitle: 'サウンドをオンにしますか？', soundCopy: '穏やかな音とともに、Mai の世界へ。右上のボタンでいつでもオフにできます。', yes: 'はい', recommended: 'おすすめ', no: '音なしで見る', choose: '言語を選択してください', auto: '日本語で始まります… {s}', paused: '自動選択を一時停止しました', pause: '一時停止', resume: '再開', device: 'お使いの端末の言語', close: '閉じる' },
+  en: { role: 'Restoring the body’s natural flow', soundTitle: 'Experience it with sound?', soundCopy: 'Gentle sound draws you into Mai’s world. Turn it off any time with the button at the top right.', yes: 'Yes', recommended: 'Recommended', no: 'Continue without sound', choose: 'Choose your language', auto: 'Continuing in English in {s}', paused: 'Automatic selection paused', pause: 'Pause', resume: 'Resume', device: 'Your device’s language', close: 'Close' },
+  zh: { role: '让身体回归自然流动', soundTitle: '要开启声音吗？', soundCopy: '在柔和的声音中，走进 Mai 的世界。可随时用右上角的按钮关闭。', yes: '是', recommended: '推荐', no: '不开声音继续', choose: '请选择语言', auto: '{s} 秒后以简体中文继续', paused: '已暂停自动选择', pause: '暂停', resume: '继续', device: '您设备的语言', close: '关闭' },
+  ko: { role: '몸 본연의 흐름을 되찾다', soundTitle: '소리를 켜시겠어요?', soundCopy: '은은한 소리와 함께 Mai의 세계로 들어가 보세요. 오른쪽 위 버튼으로 언제든지 끌 수 있어요.', yes: '네', recommended: '추천', no: '소리 없이 보기', choose: '언어를 선택해 주세요', auto: '{s}초 후 한국어로 계속합니다', paused: '자동 선택이 일시 정지되었습니다', pause: '일시 정지', resume: '계속', device: '기기 언어', close: '닫기' },
+  th: { role: 'คืนการไหลเวียนตามธรรมชาติให้ร่างกาย', soundTitle: 'เปิดเสียงไหม?', soundCopy: 'เสียงที่นุ่มนวลจะพาคุณเข้าสู่โลกของ Mai ปิดได้ทุกเมื่อด้วยปุ่มมุมขวาบน', yes: 'ใช่', recommended: 'แนะนำ', no: 'ดูต่อโดยไม่เปิดเสียง', choose: 'เลือกภาษา', auto: 'จะใช้ภาษาไทยใน {s} วินาที', paused: 'หยุดการเลือกอัตโนมัติชั่วคราว', pause: 'หยุดชั่วคราว', resume: 'ทำต่อ', device: 'ภาษาของอุปกรณ์คุณ', close: 'ปิด' },
+  fr: { role: 'Rendre au corps son flux naturel', soundTitle: 'Avec le son ?', soundCopy: 'Un son tout en douceur pour entrer dans l’univers de Mai. Coupez-le à tout moment avec le bouton en haut à droite.', yes: 'Oui', recommended: 'Recommandé', no: 'Continuer sans le son', choose: 'Choisissez votre langue', auto: 'Suite en français dans {s} s', paused: 'Sélection automatique en pause', pause: 'Pause', resume: 'Reprendre', device: 'Langue de votre appareil', close: 'Fermer' },
+  de: { role: 'Den natürlichen Fluss des Körpers wiederherstellen', soundTitle: 'Mit Ton erleben?', soundCopy: 'Sanfte Klänge führen Sie in Mais Welt. Mit der Taste oben rechts schalten Sie den Ton jederzeit aus.', yes: 'Ja', recommended: 'Empfohlen', no: 'Ohne Ton fortfahren', choose: 'Wählen Sie Ihre Sprache', auto: 'Weiter auf Deutsch in {s} s', paused: 'Automatische Auswahl pausiert', pause: 'Pausieren', resume: 'Fortsetzen', device: 'Sprache Ihres Geräts', close: 'Schließen' },
+  it: { role: 'Restituire al corpo il suo flusso naturale', soundTitle: 'Con l’audio?', soundCopy: 'Suoni delicati per entrare nel mondo di Mai. Puoi disattivarli in qualsiasi momento con il pulsante in alto a destra.', yes: 'Sì', recommended: 'Consigliato', no: 'Continua senza audio', choose: 'Scegli la lingua', auto: 'Si continua in italiano tra {s} s', paused: 'Selezione automatica in pausa', pause: 'Pausa', resume: 'Riprendi', device: 'Lingua del tuo dispositivo', close: 'Chiudi' },
+};
+
+// The opening line, shown once the language is chosen and before the page appears:
+// Mai's positioning, kept short and plain, as a Japanese wellness brand would say it.
+const STATEMENT = {
+  ja: ['からだ本来の流れを、取り戻す。', '手のひらの温もりで、ゆっくりと。'],
+  en: ['Restoring the body’s natural flow.', 'Slowly, through the warmth of her hands.'],
+  zh: ['让身体回归本来的流动。', '以掌心的温度，缓缓地。'],
+  ko: ['몸 본연의 흐름을 되찾다.', '손바닥의 온기로, 천천히.'],
+  th: ['คืนการไหลเวียนตามธรรมชาติให้ร่างกาย', 'ด้วยความอบอุ่นจากฝ่ามือ อย่างช้า ๆ'],
+  fr: ['Rendre au corps son flux naturel.', 'Lentement, par la chaleur de ses mains.'],
+  de: ['Den natürlichen Fluss des Körpers wiederfinden.', 'Langsam, durch die Wärme ihrer Hände.'],
+  it: ['Restituire al corpo il suo flusso naturale.', 'Lentamente, con il calore delle sue mani.'],
 };
 
 const ARROW = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
@@ -189,8 +202,41 @@ export function initPortal({ lenis, reduceMotion, onEnter }) {
     sound.chime();
     dialog.querySelectorAll('[data-pick]').forEach((b) => b.classList.toggle('is-chosen', b.dataset.pick === code));
     await setLang(code);
+    if (mode === 'welcome') await showStatement(code);
     close();
   };
+
+  // Mai's line rises over the satin, holds, and then the page appears. A tap skips it.
+  const showStatement = (code) =>
+    new Promise((resolve) => {
+      // Japanese and Chinese lines may only break after their commas, never inside a word.
+      const phrases = (text) =>
+        text
+          .split(/(?<=[、，])/)
+          .map((p) => `<span class="portal__phrase">${p}</span>`)
+          .join('');
+      const [line, sub] = STATEMENT[code] ?? STATEMENT.en;
+      const stage = swap(`
+        <p class="portal__statement">
+          <span class="portal__line"><span>${phrases(line)}</span></span>
+          <span class="portal__line portal__line--sub"><span>${phrases(sub)}</span></span>
+        </p>`, code);
+      dialog.classList.add('is-statement');
+      if (sound.on) sound.bowl({ freq: 220, gain: 0.07, pan: 0 });
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        dialog.removeEventListener('pointerdown', finish);
+        resolve();
+      };
+      dialog.addEventListener('pointerdown', finish);
+      if (reduceMotion) return setTimeout(finish, 2600);
+      gsap.killTweensOf(stage.children);
+      gsap.set(stage.children, { y: 0, autoAlpha: 1 });
+      gsap.from(stage.querySelectorAll('.portal__line > span'), { yPercent: 110, autoAlpha: 0, duration: 1.6, stagger: 0.75, ease: 'expo.out' });
+      setTimeout(finish, 4200);
+    });
 
   const close = () => {
     const welcome = mode === 'welcome';
@@ -208,7 +254,6 @@ export function initPortal({ lenis, reduceMotion, onEnter }) {
       root.classList.remove('portal-pending');
       onEnter?.();
       resolveEntered();
-      if (sound.on) sound.bowl({ freq: 220, gain: 0.07, pan: 0 });
     }
     if (reduceMotion) return finish();
     gsap.to(dialog.querySelector('.portal__inner'), { scale: 0.94, y: -20, autoAlpha: 0, filter: 'blur(10px)', duration: 0.7, ease: 'power2.in' });
