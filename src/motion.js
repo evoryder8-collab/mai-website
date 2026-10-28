@@ -40,10 +40,7 @@ export function initMotion({ reduceMotion, deferIntro = false }) {
 
     // Deep links (#award etc.): land on the section and reveal it now, not after window load.
     const target = location.hash.length > 1 && document.querySelector(location.hash);
-    if (target) {
-      const header = document.querySelector('[data-header]');
-      lenis.scrollTo(target, { immediate: true, force: true, offset: -(header?.offsetHeight ?? 0) + 1 });
-    }
+    if (target) lenis.scrollTo(target, { immediate: true, force: true, offset: landing(target) });
     ScrollTrigger.refresh();
   }
 
@@ -51,17 +48,20 @@ export function initMotion({ reduceMotion, deferIntro = false }) {
   return { lenis, playIntro: () => introTimeline?.play() };
 }
 
+// Lenis, like the browser, already keeps a section clear of the header (scroll-padding-top
+// on <html>). The film fills the screen, so it lands flush with the top instead.
+const headerHeight = () => document.querySelector('[data-header]')?.offsetHeight ?? 0;
+const landing = (target) => (target.matches('.film') ? headerHeight() : 0);
+
 function initAnchors(lenis) {
-  const header = document.querySelector('[data-header]');
   document.querySelectorAll('a[href^="#"]:not(.skip-link)').forEach((link) => {
     link.addEventListener('click', (e) => {
       const hash = link.getAttribute('href');
       const target = hash === '#top' ? 0 : document.querySelector(hash);
       if (target == null) return;
       e.preventDefault();
-      const offset = target === 0 ? 0 : -(header?.offsetHeight ?? 0) + 1;
-      if (lenis) lenis.scrollTo(target, { offset, duration: 1.5, force: true });
-      else window.scrollTo({ top: target === 0 ? 0 : target.getBoundingClientRect().top + scrollY + offset });
+      if (lenis) lenis.scrollTo(target, { offset: target === 0 ? 0 : landing(target), duration: 1.5, force: true });
+      else window.scrollTo({ top: target === 0 ? 0 : target.getBoundingClientRect().top + scrollY - headerHeight() + landing(target) });
     });
   });
 }
