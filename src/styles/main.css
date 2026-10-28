@@ -1119,8 +1119,27 @@ html.portal-pending body::before {
    A tall section whose stage stays on screen while you scroll through it. film.js drives
    --w --h --x --y --rx --ry --r --pad on the card and --k (0 floating → 1 full screen) on
    the section. */
-.film { --k: 0; position: relative; height: 330svh; }
+.film { --k: 0; --tide: 0px; --wx: 0px; position: relative; height: 330svh; }
 .film__pin { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+/* The satin tide (film.js sets --tide and moves --wx): the stage is cut along a slowly
+   moving liquid edge, so the page's own satin shows beneath it, first a little for the
+   hint, then rising over the whole film as the section ends. */
+.film__stage {
+  position: absolute; inset: 0;
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tide) + 1px) no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='24'%3E%3Cpath d='M0 0H480V12C400 3 320 21 240 12 160 3 80 21 0 12Z'/%3E%3C/svg%3E") left var(--wx) bottom calc(var(--tide) - 24px) / 480px 24px repeat-x;
+  mask:
+    linear-gradient(#000 0 0) top / 100% calc(100% - var(--tide) + 1px) no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='24'%3E%3Cpath d='M0 0H480V12C400 3 320 21 240 12 160 3 80 21 0 12Z'/%3E%3C/svg%3E") left var(--wx) bottom calc(var(--tide) - 24px) / 480px 24px repeat-x;
+}
+/* The hem: a soft sheen running along the satin's edge. */
+.film__hem {
+  position: absolute; left: 0; right: 0; bottom: calc(var(--tide) - 24px); height: 24px; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='24'%3E%3Cpath d='M480 12C400 3 320 21 240 12 160 3 80 21 0 12' fill='none' stroke='%23fffaf0' stroke-width='2.2' stroke-opacity='.85'/%3E%3C/svg%3E") left var(--wx) top / 480px 24px repeat-x;
+  filter: drop-shadow(0 0 6px rgb(255 236 200 / 0.9)) drop-shadow(0 -3px 8px rgb(42 28 19 / 0.25));
+  opacity: clamp(0, calc(var(--tide) / 40px), 1);
+}
 .film__theater {
   position: absolute; inset: 0; pointer-events: none;
   background: radial-gradient(70% 60% at 50% 50%, rgb(52 32 18 / 0.92), #0f0905 75%);
@@ -1194,7 +1213,7 @@ html:is(:lang(ja), :lang(zh), :lang(ko)) .film__title { font-family: var(--f-min
 
 /* Controls appear as it grows. */
 .film__ui {
-  position: absolute; right: calc(var(--pad, 10px) + 14px); bottom: calc(var(--pad, 10px) + max(18px, env(safe-area-inset-bottom)));
+  position: absolute; right: calc(var(--pad, 10px) + 14px); bottom: calc(var(--pad, 10px) + max(18px, env(safe-area-inset-bottom)) + var(--tide));
   display: flex; gap: 8px;
   opacity: clamp(0, calc((var(--k) - 0.55) * 3), 1);
   pointer-events: none;
@@ -1215,7 +1234,7 @@ html:is(:lang(ja), :lang(zh), :lang(ko)) .film__title { font-family: var(--f-min
 .film__sound.is-muted { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 0 0 0 rgb(233 162 27 / 0.7); animation: call 1.8s var(--ease) infinite; }
 @keyframes call { 70% { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.9), 0 0 0 12px rgb(233 162 27 / 0); } }
 .film__bar {
-  position: absolute; left: var(--pad, 10px); right: var(--pad, 10px); bottom: var(--pad, 10px); height: 3px;
+  position: absolute; left: var(--pad, 10px); right: var(--pad, 10px); bottom: calc(var(--pad, 10px) + var(--tide)); height: 3px;
   overflow: hidden; border-radius: 0 0 calc(var(--r, 30px) - var(--pad, 10px)) calc(var(--r, 30px) - var(--pad, 10px));
   background: rgb(255 255 255 / 0.18); opacity: var(--k);
 }
@@ -1228,6 +1247,24 @@ html:is(:lang(ja), :lang(zh), :lang(ko)) .film__title { font-family: var(--f-min
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), 0 16px 40px -10px rgb(185 116 10 / 0.8);
 }
 .film__replay[hidden] { display: none; }
+/* Two seconds into playback (film.js): the hint, on the satin. */
+.film__exit {
+  position: absolute; z-index: 3; left: 0; right: 0; bottom: max(26px, env(safe-area-inset-bottom));
+  display: flex; align-items: center; justify-content: center; gap: 0.65rem;
+  font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; color: var(--ink);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.6);
+  opacity: 0; translate: 0 12px; pointer-events: none;
+  transition: opacity 0.8s var(--ease) 0.25s, translate 0.8s var(--ease) 0.25s;
+}
+.film__exit.is-on { opacity: 1; translate: 0 0; }
+.film.is-covering :is(.film__exit, .film__ui, .film__bar) { opacity: 0; transition: opacity 0.4s var(--ease); }
+.film__chev {
+  width: 9px; height: 9px; margin-top: -4px;
+  border-right: 1.5px solid var(--saffron-deep); border-bottom: 1.5px solid var(--saffron-deep);
+  rotate: 45deg;
+  animation: chev 1.6s var(--ease) infinite;
+}
+@keyframes chev { 0%, 100% { translate: 0 -2px; opacity: 0.5; } 50% { translate: 0 3px; opacity: 1; } }
 
 /* Full screen: the header steps aside. */
 html.film-full .site-header { transform: translateY(-110%); }
@@ -1246,6 +1283,7 @@ html.film-full .site-header { transform: translateY(-110%); }
   .film__title { font-size: clamp(1.9rem, 8.4vw, 2.6rem); }
   html:is(:lang(ja), :lang(zh), :lang(ko)) .film__title { font-size: clamp(1.5rem, 6.6vw, 2.1rem); }
   .film__hint { margin-top: 0.7rem; font-size: 0.68rem; }
+  .film__exit { bottom: max(36px, env(safe-area-inset-bottom)); font-size: 0.7rem; letter-spacing: 0.1em; }
 }
 
 /* Reduced motion: a still card that plays on tap. */
@@ -1253,7 +1291,8 @@ html.film-full .site-header { transform: translateY(-110%); }
 .film.is-static .film__pin { position: relative; height: auto; display: grid; justify-items: center; gap: 2rem; padding: clamp(4rem, 10vw, 7rem) var(--gutter); }
 .film.is-static :is(.film__copy, .film__frame) { position: relative; left: auto; top: auto; translate: none; transform: none; opacity: 1; max-width: 560px; text-align: center; }
 .film.is-static .film__frame { width: min(360px, 80vw); height: auto; aspect-ratio: 9 / 16; }
-.film.is-static :is(.film__hint, .film__ui, .film__bar, .film__theater) { display: none; }
+.film.is-static :is(.film__hint, .film__ui, .film__bar, .film__theater, .film__exit, .film__hem) { display: none; }
+.film.is-static .film__stage { position: relative; -webkit-mask: none; mask: none; display: grid; justify-items: center; gap: 2rem; }
 
 /* ---------- Book (end of each page) ---------- */
 .cta-band { padding-top: 0; }

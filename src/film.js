@@ -16,6 +16,7 @@ const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
 // Scroll progress through the section.
 const GROW = [0.16, 0.42]; // floating card → full screen
 const PLAY = [0.34, 0.97]; // the film plays inside this window
+const COVER = [0.84, 1.0]; // the satin rises over the film, on to the next section
 
 export function initFilm({ reduceMotion }) {
   const section = document.querySelector('.film');
@@ -30,6 +31,7 @@ export function initFilm({ reduceMotion }) {
   const root = document.documentElement;
 
   let wantSound = sound.on;
+  video.muted = true;
   let playing = false;
   let inWindow = false;
   let ended = false;
@@ -85,11 +87,34 @@ export function initFilm({ reduceMotion }) {
   };
   document.addEventListener('langchange', syncSoundUi);
 
+  // If the sound can't actually be played (footage is there, but the clock doesn't move),
+  // carry on muted. Watched from the start: in that state play() may never settle.
+  const watchSound = () => {
+    let checks = 0;
+    let from = video.currentTime;
+    const watch = setInterval(() => {
+      const ahead = [...Array(video.buffered.length).keys()].some((i) => video.buffered.start(i) <= video.currentTime && video.buffered.end(i) > video.currentTime + 1);
+      if (!playing || video.muted || video.paused || ++checks > 6) return clearInterval(watch);
+      if (ahead && video.currentTime - from < 0.25) {
+        // A stalled start can leave the decoder stuck even once muted: reset it and go again.
+        clearInterval(watch);
+        const at = video.currentTime;
+        setMuted(true);
+        video.load();
+        video.currentTime = at;
+        video.play().catch(() => {});
+      }
+      from = video.currentTime;
+    }, 1000);
+  };
+
   const play = async () => {
     if (playing || ended) return;
     load();
     playing = true;
     video.muted = !wantSound;
+    syncSoundUi();
+    if (!video.muted) watchSound();
     try {
       await video.play();
     } catch {
@@ -133,9 +158,19 @@ export function initFilm({ reduceMotion }) {
     sound.duck(false);
     replay.hidden = false;
   });
+  // Two seconds into playback the satin rises a little at the bottom, with the hint on it:
+  // keep scrolling to stop the film.
+  const exitHint = section.querySelector('.film__exit');
+  let hintOn = false;
+  const syncExitHint = () => {
+    hintOn = inWindow && !ended && !video.paused && video.currentTime >= 2;
+    exitHint.classList.toggle('is-on', hintOn);
+  };
   video.addEventListener('timeupdate', () => {
     if (video.duration) bar.style.transform = `scaleX(${(video.currentTime / video.duration).toFixed(4)})`;
+    syncExitHint();
   });
+  ['pause', 'ended'].forEach((ev) => video.addEventListener(ev, syncExitHint));
   // Tapping the playing film pauses it, and tapping again resumes.
   video.addEventListener('click', () => {
     if (!inWindow) return;
@@ -204,10 +239,12 @@ export function initFilm({ reduceMotion }) {
     s.setProperty('--r', `${lerp(30, rect.portrait ? 0 : 18, k).toFixed(1)}px`);
     s.setProperty('--pad', `${lerp(10, 0, k).toFixed(1)}px`);
     section.style.setProperty('--k', k.toFixed(3));
-    // Only while the stage is held: once it scrolls away the header comes back.
-    const full = k > 0.98 && p < 0.99;
+    // Only while the film has the screen: once the satin has mostly covered it the header comes back.
+    cover = ease(clamp((p - COVER[0]) / (COVER[1] - COVER[0])));
+    const full = k > 0.98 && cover < 0.6;
     root.classList.toggle('film-full', full);
     section.classList.toggle('is-full', full);
+    section.classList.toggle('is-covering', cover > 0.04);
 
     const nowIn = p >= PLAY[0] && p <= PLAY[1];
     if (nowIn !== inWindow) {
@@ -217,14 +254,27 @@ export function initFilm({ reduceMotion }) {
     }
   }
 
-  // Keep the floating card alive while it waits.
-  const idle = () => {
-    requestAnimationFrame(idle);
-    if (lastP >= GROW[1]) return;
-    const r = section.getBoundingClientRect();
-    if (r.top < vh && r.bottom > 0) update(lastP);
+  // While the section is on screen: keep the floating card alive, move the satin's liquid
+  // edge, and raise the tide (a little for the hint, all the way as the section ends; it
+  // follows the scroll closely there and rises gently for the hint).
+  let cover = 0;
+  let tide = 0;
+  let onScreen = false;
+  let raf = 0;
+  const tick = (now) => {
+    raf = 0;
+    if (!onScreen) return;
+    if (lastP < GROW[1]) update(lastP);
+    const target = Math.max(hintOn ? (vw < 760 ? 112 : 96) : 0, cover * (vh + 60));
+    tide += (target - tide) * (cover > 0 ? 0.35 : 0.06);
+    section.style.setProperty('--tide', `${tide.toFixed(1)}px`);
+    section.style.setProperty('--wx', `${((now / 1000) * 46) % 480}px`);
+    raf = requestAnimationFrame(tick);
   };
-  requestAnimationFrame(idle);
+  new IntersectionObserver(([e]) => {
+    onScreen = e.isIntersecting;
+    if (onScreen && !raf) raf = requestAnimationFrame(tick);
+  }).observe(section);
 
   const onScroll = () => {
     const r = section.getBoundingClientRect();

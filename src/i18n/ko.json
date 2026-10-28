@@ -161,5 +161,6 @@
  "film-hint": "스크롤하여 보기",
  "film-label": "영상",
  "film-replay": "다시 보기",
- "film-sound-on": "소리 켜짐"
+ "film-sound-on": "소리 켜짐",
+ "film-exit": "계속 스크롤하면 영상이 멈춥니다"
 }

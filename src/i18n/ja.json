@@ -161,5 +161,6 @@
  "film-hint": "スクロールして観る",
  "film-label": "映像",
  "film-replay": "もう一度観る",
- "film-sound-on": "音あり"
+ "film-sound-on": "音あり",
+ "film-exit": "スクロールを続けると映像が止まります"
 }

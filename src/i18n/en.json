@@ -161,5 +161,6 @@
  "film-hint": "Scroll to watch",
  "film-label": "Film",
  "film-replay": "Watch again",
- "film-sound-on": "Sound on"
+ "film-sound-on": "Sound on",
+ "film-exit": "Keep scrolling to stop the film"
 }
