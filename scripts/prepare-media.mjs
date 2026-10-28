@@ -1,6 +1,6 @@
 // Turns the originals in media-src/ into web-ready files in public/media/.
 // Run with `npm run media` after adding or replacing an original, or `npm run media -- dogs`
-// (photos, og, video, dogs) to redo just one group.
+// (photos, logo, og, video, dogs) to redo just one group.
 // sharp drops EXIF/GPS metadata by default, and ffmpeg is told to do the same,
 // so nothing from the camera ends up in the public repo.
 import { mkdir } from 'node:fs/promises';
@@ -45,6 +45,19 @@ for (const [file, [name, [left, top, size]]] of run('dogs') ? Object.entries(DOG
     await img.clone().jpeg({ quality: 78, mozjpeg: true }).toFile(`${OUT}/${name}-${w}.jpg`);
   }
   console.log(`dog    ${file} -> ${name}-{360,720}.{avif,jpg}`);
+}
+
+// Her logo (transparent PNG), trimmed to the artwork. It goes to src/assets/ rather than
+// public/, so the header, the portal and the CSS can all reference it with hashed paths.
+if (run('logo')) {
+  await mkdir('src/assets', { recursive: true });
+  const logo = await sharp(`${SRC}/mai-logo.png`).trim().toBuffer();
+  for (const w of [320, 720, 1200]) {
+    const img = sharp(logo).resize({ width: w });
+    await img.clone().avif({ quality: 60, effort: 6 }).toFile(`src/assets/mai-logo-${w}.avif`);
+    await img.clone().webp({ quality: 86, alphaQuality: 100, effort: 6 }).toFile(`src/assets/mai-logo-${w}.webp`);
+  }
+  console.log('logo   mai-logo.png -> src/assets/mai-logo-{320,720,1200}.{avif,webp}');
 }
 
 // Link preview for LINE, iMessage, social apps.

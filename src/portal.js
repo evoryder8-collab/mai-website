@@ -14,8 +14,13 @@ import it from 'flag-icons/flags/1x1/it.svg?raw';
 import jp from 'flag-icons/flags/1x1/jp.svg?raw';
 import kr from 'flag-icons/flags/1x1/kr.svg?raw';
 import th from 'flag-icons/flags/1x1/th.svg?raw';
+import logoAvif720 from './assets/mai-logo-720.avif';
+import logoAvif1200 from './assets/mai-logo-1200.avif';
+import logoWebp720 from './assets/mai-logo-720.webp';
+import logoWebp1200 from './assets/mai-logo-1200.webp';
 
 const FLAGS = { jp, gb, cn, kr, th, fr, de, it };
+const LOGO_SIZES = '(min-width: 600px) 360px, 68vw';
 const COUNTDOWN = 5000;
 
 // The portal speaks before any dictionary is loaded, so its few lines live here.
@@ -67,7 +72,12 @@ export function initPortal({ lenis, reduceMotion, onEnter }) {
       <div class="portal__inner">
         <button class="portal__close" type="button" data-portal-close hidden><span class="choice__x" aria-hidden="true"></span><span class="visually-hidden" data-copy="close"></span></button>
         <div class="portal__brand">
-          <span class="portal__mai brand__mark"><span class="brand__name">Mai</span><span class="brand__spark" aria-hidden="true">✦</span></span>
+          <span class="logo portal__logo">
+            <picture>
+              <source type="image/avif" srcset="${logoAvif720} 720w, ${logoAvif1200} 1200w" sizes="${LOGO_SIZES}">
+              <img src="${logoWebp720}" srcset="${logoWebp720} 720w, ${logoWebp1200} 1200w" sizes="${LOGO_SIZES}" width="320" height="173" alt="Mai">
+            </picture>
+          </span>
           <span class="portal__role" data-copy="role"></span>
         </div>
         <div class="portal__stage"></div>

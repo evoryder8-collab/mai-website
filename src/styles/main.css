@@ -192,32 +192,25 @@ html:lang(ja) :is(h1, h2, h3, .band__line, .hero__lead) { word-break: auto-phras
 .site-header.is-hidden { transform: translateY(-100%); }
 
 .brand { display: flex; align-items: center; gap: 0.85rem; }
-.brand__name { font-family: var(--f-serif); font-size: 2rem; font-weight: 400; font-style: italic; line-height: 1; letter-spacing: -0.01em; }
-/* The logo: ink "Mai" with a gold gleam passing through it, a softly breathing saffron
-   glow, and a star that twinkles at its shoulder. */
-.brand__mark { position: relative; display: inline-block; }
-.brand__mark .brand__name {
-  display: inline-block; padding: 0.06em 0.1em 0.1em 0.02em;
-  background: linear-gradient(100deg, var(--ink) 0 40%, #b9740a 45%, #fff1c9 50%, #e9a21b 55%, var(--ink) 60% 100%) 100% 0 / 300% 100%;
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  animation: logo-gleam 6.5s var(--ease) 1.2s infinite, logo-breathe 4.4s ease-in-out infinite;
+/* Her logo: a gold gleam passes across it now and then, masked to the artwork, and in the
+   header it breathes with a soft saffron glow. */
+.logo { position: relative; display: block; isolation: isolate; line-height: 0; }
+.logo img { display: block; width: 100%; height: auto; }
+.logo::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent 0 42%, rgb(255 236 196 / 0.9) 50%, transparent 58% 100%) 100% 0 / 300% 100% no-repeat;
+  -webkit-mask: url('../assets/mai-logo-320.webp') center / 100% 100% no-repeat;
+  mask: url('../assets/mai-logo-320.webp') center / 100% 100% no-repeat;
+  mix-blend-mode: screen;
+  animation: logo-gleam 6.5s var(--ease) 1.2s infinite;
 }
 @keyframes logo-gleam { 0%, 52% { background-position: 100% 0; } 82%, 100% { background-position: 0% 0; } }
 @keyframes logo-breathe {
   0%, 100% { filter: drop-shadow(0 0 0 rgb(233 162 27 / 0)) drop-shadow(0 0 0 rgb(255 214 140 / 0)); }
-  50% { filter: drop-shadow(0 0 9px rgb(233 162 27 / 0.55)) drop-shadow(0 0 2px rgb(255 214 140 / 0.7)); }
+  50% { filter: drop-shadow(0 0 9px rgb(233 162 27 / 0.5)) drop-shadow(0 0 2px rgb(255 214 140 / 0.6)); }
 }
-.brand__spark {
-  position: absolute; right: -0.55rem; top: -0.3rem;
-  font-size: 0.72rem; line-height: 1; color: var(--saffron);
-  text-shadow: 0 0 8px rgb(233 162 27 / 0.9);
-  animation: spark 3.4s ease-in-out infinite;
-}
-@keyframes spark {
-  0%, 100% { scale: 0.2; rotate: 0deg; opacity: 0; }
-  35% { scale: 1.1; rotate: 90deg; opacity: 1; }
-  60% { scale: 0.7; rotate: 150deg; opacity: 0.7; }
-}
+.brand__logo { width: clamp(96px, 8.4vw, 116px); }
+.brand__logo img { animation: logo-breathe 4.4s ease-in-out infinite; }
 .brand__tag { padding-top: 0.25rem; font-size: 0.68rem; letter-spacing: 0.18em; line-height: 1; white-space: nowrap; color: var(--ink-2); text-transform: uppercase; }
 
 .nav__list { display: flex; gap: clamp(1.2rem, 2.6vw, 2.6rem); }
@@ -1091,13 +1084,10 @@ html:is(:lang(ja), :lang(zh), :lang(ko)) .choice__title { font-family: var(--f-m
 .choice__cancel:hover { background: rgb(42 28 19 / 0.05); }
 
 /* ---------- Welcome portal (portal.js) ---------- */
-/* First paint of a visit: "Mai" breathing on linen while the portal loads. */
+/* First paint of a visit: her logo on linen while the portal loads. */
 html.portal-pending body::before {
-  content: 'Mai'; position: fixed; inset: 0; z-index: 400; visibility: visible;
-  display: grid; place-items: center;
-  background: var(--linen);
-  font-family: var(--f-serif); font-style: italic; font-weight: 300; font-size: clamp(5rem, 22vw, 8rem); color: var(--ink);
-  animation: logo-breathe 2.4s ease-in-out infinite;
+  content: ''; position: fixed; inset: 0; z-index: 400; visibility: visible;
+  background: url('../assets/mai-logo-720.webp') center / min(68vw, 360px) auto no-repeat, var(--linen);
 }
 .portal {
   position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
@@ -1130,8 +1120,8 @@ html.portal-pending body::before {
   width: 2.8rem; height: 2.8rem; border: 0; border-radius: 50%; background: rgb(42 28 19 / 0.07); cursor: pointer;
 }
 .portal__brand { display: grid; justify-items: center; gap: 0.5rem; }
-.portal__mai .brand__name { font-family: var(--f-serif); font-style: italic; font-weight: 300; font-size: clamp(4.6rem, 21vw, 7.5rem); line-height: 1; }
-.portal__mai .brand__spark { font-size: 1.3rem; right: -1.1rem; top: 0.3rem; }
+.portal__logo { width: min(68vw, 360px); }
+.portal__logo::after { -webkit-mask-image: url('../assets/mai-logo-720.webp'); mask-image: url('../assets/mai-logo-720.webp'); }
 .portal__role { font-size: 0.72rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--ink-2); }
 .portal__stage { width: 100%; display: grid; justify-items: center; gap: 1rem; }
 .portal__title { font-family: var(--f-serif); font-weight: 400; font-size: clamp(2rem, 7.4vw, 2.9rem); line-height: 1.15; }
