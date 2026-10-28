@@ -212,6 +212,7 @@ html:lang(ja) :is(h1, h2, h3, .band__line, .hero__lead) { word-break: auto-phras
 .brand__logo { width: clamp(96px, 8.4vw, 116px); }
 .brand__logo img { animation: logo-breathe 4.4s ease-in-out infinite; }
 .brand__tag { padding-top: 0.25rem; font-size: 0.68rem; letter-spacing: 0.18em; line-height: 1; white-space: nowrap; color: var(--ink-2); text-transform: uppercase; }
+html:is(:lang(ja), :lang(zh), :lang(ko)) .brand__tag { padding-top: 0.1rem; font-family: var(--f-mincho); font-size: 0.8rem; letter-spacing: 0.24em; }
 
 .nav__list { display: flex; gap: clamp(1.2rem, 2.6vw, 2.6rem); }
 .nav__list a { position: relative; font-size: 0.88rem; letter-spacing: 0.08em; padding-block: 0.4rem; }
