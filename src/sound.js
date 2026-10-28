@@ -1,10 +1,15 @@
-// Sound, all synthesised with Web Audio (no audio files): a warm ambient drone with
-// singing-bowl tones now and then, and soft sounds for touches, flings, the map flight
-// and the Yu-fai fire. Nothing plays until the visitor says yes (portal or header
+// Sound: her background music ("Weightless Clouds 2", looping at 40% to start with, picking
+// up on each page where the last one left off), soft synthesised sounds for touches,
+// flings, the map flight and the Yu-fai fire, and Latte's and Mugi's barks, all through
+// one Web Audio mix. Nothing plays until the visitor says yes (portal or header
 // speaker); the choice is remembered. On later pages browsers only allow audio after a
-// tap, so the ambience fades in on the first one.
+// tap, so the music fades in on the first one.
+
+import musicUrl from './assets/mai-music.mp3';
 
 const KEY = 'mai-sound';
+const MUSIC_VOLUME = 0.4;
+const MUSIC_AT = 'mai-music-at';
 const PENTATONIC = [220, 246.94, 277.18, 329.63, 369.99, 440];
 const BOWL_PARTIALS = [
   [1, 1],
@@ -26,13 +31,13 @@ let ambientBus;
 let sfxBus;
 let reverb;
 let noise;
-let drone = null;
-let bowlTimer = 0;
+let music = null;
 let fire = null;
 let lastHover = 0;
 let analyser = null;
 let meter = null;
 const listeners = new Set();
+const recordings = new Map();
 
 function graph() {
   if (ctx) return ctx;
@@ -69,7 +74,13 @@ function graph() {
   for (let i = 0; i < n.length; i++) n[i] = Math.random() * 2 - 1;
   document.addEventListener('visibilitychange', () => {
     if (!enabled) return;
-    document.hidden ? ctx.suspend() : ctx.resume();
+    if (document.hidden) {
+      ctx.suspend();
+      music?.el.pause();
+    } else {
+      ctx.resume();
+      music?.el.play().catch(() => {});
+    }
   });
   return ctx;
 }
@@ -82,57 +93,43 @@ function envelope(gain, peak, attack, decay, at = now()) {
   gain.gain.exponentialRampToValueAtTime(0.0001, at + attack + decay);
 }
 
-function startDrone() {
-  if (drone) return;
-  const out = ctx.createGain();
-  out.gain.value = 0;
-  out.gain.linearRampToValueAtTime(0.055, now() + 4);
-  const filter = ctx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 800;
-  filter.Q.value = 0.4;
-  filter.connect(out).connect(ambientBus);
-  out.connect(reverb);
-  // Slow breathing on the brightness.
-  const lfo = ctx.createOscillator();
-  const depth = ctx.createGain();
-  lfo.frequency.value = 0.06;
-  depth.gain.value = 320;
-  lfo.connect(depth).connect(filter.frequency);
-  lfo.start();
-  const voices = [110, 164.81, 220, 329.63].flatMap((f, i) =>
-    [-3, 3].map((cents) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = i % 2 ? 'triangle' : 'sine';
-      o.frequency.value = f;
-      o.detune.value = cents;
-      g.gain.value = [0.5, 0.28, 0.22, 0.08][i];
-      o.connect(g).connect(filter);
-      o.start();
-      return o;
-    }),
-  );
-  drone = { out, stop: () => [...voices, lfo].forEach((o) => o.stop(now() + 2.5)) };
-  scheduleBowl(2.5);
+// The music streams from an <audio> element into the mix, so the master fade, the film's
+// ducking and the background's response to sound all apply to it.
+function startMusic() {
+  if (!music) {
+    const el = new Audio(musicUrl);
+    el.loop = true;
+    el.preload = 'auto';
+    // Carry on where the previous page left off.
+    el.addEventListener('loadedmetadata', () => {
+      try {
+        const at = parseFloat(sessionStorage.getItem(MUSIC_AT));
+        if (at > 0) el.currentTime = at % el.duration;
+      } catch {}
+    }, { once: true });
+    const remember = () => {
+      try {
+        sessionStorage.setItem(MUSIC_AT, String(el.currentTime));
+      } catch {}
+    };
+    addEventListener('pagehide', remember);
+    setInterval(() => !el.paused && remember(), 2000);
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    ctx.createMediaElementSource(el).connect(gain).connect(ambientBus);
+    music = { el, gain };
+  }
+  music.gain.gain.cancelScheduledValues(now());
+  music.gain.gain.setTargetAtTime(MUSIC_VOLUME, now(), 1.2);
+  music.el.play().catch(() => {});
 }
 
-function stopDrone() {
-  if (!drone) return;
-  drone.out.gain.cancelScheduledValues(now());
-  drone.out.gain.setTargetAtTime(0, now(), 0.6);
-  drone.stop();
-  drone = null;
-  clearTimeout(bowlTimer);
-}
-
-function scheduleBowl(delay) {
-  clearTimeout(bowlTimer);
-  bowlTimer = setTimeout(() => {
-    if (!drone) return;
-    bowl({ gain: 0.035 + Math.random() * 0.025 });
-    scheduleBowl(9 + Math.random() * 7);
-  }, delay * 1000);
+function stopMusic() {
+  if (!music) return;
+  music.gain.gain.cancelScheduledValues(now());
+  music.gain.gain.setTargetAtTime(0, now(), 0.4);
+  const { el } = music;
+  setTimeout(() => !enabled && el.pause(), 1600);
 }
 
 function bowl({ freq = PENTATONIC[Math.floor(Math.random() * PENTATONIC.length)], gain = 0.06, pan = Math.random() - 0.5 } = {}) {
@@ -178,11 +175,11 @@ export const sound = {
       if (!graph()) return;
       ctx.resume().then(() => {
         master.gain.setTargetAtTime(1, now(), 0.4);
-        startDrone();
+        startMusic();
       });
     } else if (ctx) {
       master.gain.setTargetAtTime(0, now(), 0.25);
-      stopDrone();
+      stopMusic();
       sound.fire(false);
     }
     listeners.forEach((fn) => fn(enabled));
@@ -258,6 +255,31 @@ export const sound = {
 
   bowl,
 
+  /** Fetch and decode a recording once, ahead of time (only once sound is on). */
+  load(url) {
+    if (!enabled || !graph()) return Promise.resolve(null);
+    if (!recordings.has(url)) {
+      recordings.set(url, fetch(url).then((r) => r.arrayBuffer()).then((b) => ctx.decodeAudioData(b)).catch(() => null));
+    }
+    return recordings.get(url);
+  },
+
+  /** Play a recording, placed a little left or right. */
+  play(url, { gain = 0.55, pan = 0 } = {}) {
+    if (!ready()) return;
+    sound.load(url).then((buffer) => {
+      if (!buffer || !ready()) return;
+      const src = ctx.createBufferSource();
+      const g = ctx.createGain();
+      const p = ctx.createStereoPanner();
+      src.buffer = buffer;
+      g.gain.value = gain;
+      p.pan.value = pan;
+      src.connect(g).connect(p).connect(sfxBus);
+      src.start();
+    });
+  },
+
   /** Air moving: filtered noise sweeping between two frequencies. */
   whoosh({ dur = 0.6, from = 400, to = 2200, gain = 0.08 } = {}) {
     if (!ready()) return;
@@ -332,7 +354,7 @@ export function initSound() {
       ctx.resume().then(() => {
         if (!enabled) return;
         master.gain.setTargetAtTime(1, now(), 0.6);
-        startDrone();
+        startMusic();
       });
     };
     wake();

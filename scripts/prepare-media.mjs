@@ -1,6 +1,6 @@
 // Turns the originals in media-src/ into web-ready files in public/media/.
 // Run with `npm run media` after adding or replacing an original, or `npm run media -- dogs`
-// (photos, logo, og, video, dogs) to redo just one group.
+// (photos, logo, og, video, dogs, barks, music) to redo just one group.
 // sharp drops EXIF/GPS metadata by default, and ffmpeg is told to do the same,
 // so nothing from the camera ends up in the public repo.
 import { mkdir } from 'node:fs/promises';
@@ -58,6 +58,33 @@ if (run('logo')) {
     await img.clone().webp({ quality: 86, alphaQuality: 100, effort: 6 }).toFile(`src/assets/mai-logo-${w}.webp`);
   }
   console.log('logo   mai-logo.png -> src/assets/mai-logo-{320,720,1200}.{avif,webp}');
+}
+
+// Two chihuahua barks for the moment Latte and Mugi land (dogs.js): from the first bark,
+// three seconds, levelled to the same loudness and fading out smoothly to the end.
+const BARKS = {
+  'bark-playful.wav': ['bark-latte', 0.14],
+  'bark-small.wav': ['bark-mugi', 0],
+};
+if (run('barks')) {
+  await mkdir('src/assets', { recursive: true });
+  for (const [file, [name, start]] of Object.entries(BARKS)) {
+    execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', `${SRC}/${file}`, '-map_metadata', '-1',
+      '-af', `atrim=start=${start}:duration=3,asetpts=PTS-STARTPTS,loudnorm=I=-19:TP=-2:LRA=11,afade=t=in:d=0.01,afade=t=out:st=1.8:d=1.2`,
+      '-ac', '1', '-ar', '44100', '-c:a', 'libmp3lame', '-b:a', '96k', `src/assets/${name}.mp3`], { stdio: 'inherit' });
+    console.log(`sound  ${file} -> src/assets/${name}.mp3`);
+  }
+}
+
+// Her background music ("Weightless Clouds 2"): levelled, without its tags or cover art,
+// fading in and out at the ends so the loop comes round softly.
+if (run('music')) {
+  const MUSIC = `${SRC}/weightless-clouds-2.mp3`;
+  const length = parseFloat(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', MUSIC]));
+  execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', MUSIC, '-map', '0:a', '-map_metadata', '-1',
+    '-af', `loudnorm=I=-18:TP=-2:LRA=11,afade=t=in:d=2,afade=t=out:st=${(length - 4).toFixed(2)}:d=4`,
+    '-ac', '2', '-ar', '44100', '-c:a', 'libmp3lame', '-b:a', '128k', 'src/assets/mai-music.mp3'], { stdio: 'inherit' });
+  console.log('sound  weightless-clouds-2.mp3 -> src/assets/mai-music.mp3');
 }
 
 // Link preview for LINE, iMessage, social apps.

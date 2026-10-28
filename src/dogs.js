@@ -1,11 +1,14 @@
 // Latte and Mugi. As their section comes into view they roll in from either side of the
 // screen, like coins across a table, and settle upright with a little wobble; the moment
-// they land, golden and blossom-pink paw prints burst out of their portraits with a few
-// sparkles, arcing up and tumbling down under gravity, bouncing once on the floor and
+// they land, each gives a little bark (with sound on) and golden and blossom-pink paw
+// prints burst out of their portraits with a few sparkles, arcing up and tumbling down under gravity, bouncing once on the floor and
 // fading. Tapping a portrait (or hovering it) sends another burst, and while the section
 // is on screen one of them now and then lets out a few more. The particles are drawn on
 // one canvas over the section, only while there are some to draw.
+import barkLatte from './assets/bark-latte.mp3';
+import barkMugi from './assets/bark-mugi.mp3';
 import { gsap, ScrollTrigger } from './motion.js';
+import { sound } from './sound.js';
 
 const PAW = new Path2D();
 [[16, 21, 6.5, 5.5], [7.5, 13.5, 2.6, 3.4], [12.5, 8.5, 2.6, 3.4], [19.5, 8.5, 2.6, 3.4], [24.5, 13.5, 2.6, 3.4]].forEach(([x, y, rx, ry]) => {
@@ -15,6 +18,7 @@ const PAW = new Path2D();
 const STAR = new Path2D('M0 -1 Q0.12 -0.12 1 0 Q0.12 0.12 0 1 Q-0.12 0.12 -1 0 Q-0.12 -0.12 0 -1Z');
 const PAW_COLOURS = ['#e9a21b', '#d98b12', '#f0b93a', '#ee9fa0', '#f2b0ac'];
 const GRAVITY = 1150;
+const BARKS = [barkLatte, barkMugi];
 
 export function initDogs({ reduceMotion }) {
   const section = document.querySelector('.dogs');
@@ -137,9 +141,20 @@ export function initDogs({ reduceMotion }) {
     tl.fromTo(dog, { x: () => side * distance() }, { x: 0, duration: 1.25, ease: 'power3.out', immediateRender: true }, at)
       .fromTo(medal, { rotation: () => turn() }, { rotation: 0, duration: 1.25, ease: 'power3.out', immediateRender: true }, at)
       .to(medal, { keyframes: { rotation: [-side * 7, side * 4, -side * 1.5, 0], scale: [1.06, 0.98, 1.01, 1] }, duration: 0.9, ease: 'sine.inOut' }, at + 1.05)
-      .call(() => burst(dog, 22), null, at + 0.95);
+      .call(() => {
+        burst(dog, 22);
+        sound.play(BARKS[i], { pan: side * 0.35 });
+      }, null, at + 0.95);
   });
   gsap.set(dogs, { x: (i) => (i === 0 ? -1 : 1) * innerWidth });
+  // The barks are decoded ahead of time, so they land exactly with the paws.
+  const preload = () => BARKS.forEach((url) => sound.load(url));
+  new IntersectionObserver(([e], io) => {
+    if (!e.isIntersecting) return;
+    io.disconnect();
+    preload();
+  }, { rootMargin: '900px 0px' }).observe(section);
+  sound.onChange((on) => on && preload());
   ScrollTrigger.create({
     trigger: section.querySelector('.dogs__pair'),
     start: 'top 82%',
