@@ -1,5 +1,6 @@
 import { initButtons } from './buttons.js';
 import { initDirections } from './directions.js';
+import { initDogs } from './dogs.js';
 import { initFilm } from './film.js';
 import { initLang, getLang } from './lang.js';
 import { initNav } from './nav.js';
@@ -22,6 +23,7 @@ initSash({ lenis, reduceMotion });
 initFilm({ reduceMotion });
 initButtons({ reduceMotion });
 initDirections({ lenis, reduceMotion });
+initDogs({ reduceMotion });
 
 const whenIdle = (fn) => (window.requestIdleCallback ? requestIdleCallback(fn, { timeout: 1500 }) : setTimeout(fn, 300));
 
