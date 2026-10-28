@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
+import { ready as langReady, translate } from './lang.js';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
 
@@ -114,8 +115,12 @@ function immersiveFilm() {
   const figure = document.querySelector('[data-film]');
   const frame = figure?.querySelector('.video-frame');
   if (!frame) return;
-  matchMedia('(max-width: 759px)').addEventListener('change', () => ScrollTrigger.refresh());
+  const backdrop = figure.querySelector('.film__backdrop');
+  const caption = figure.querySelector('figcaption');
   const mm = gsap.matchMedia();
+  mm.add('(min-width: 760px)', () => {
+    gsap.from(figure, { y: 40, autoAlpha: 0, duration: 1.25, ease: 'expo.out', scrollTrigger: { trigger: figure, start: 'top 90%', once: true } });
+  });
   mm.add('(max-width: 759px)', () => {
     let immersed = false;
     const announce = (on) => {
@@ -124,26 +129,42 @@ function immersiveFilm() {
       figure.classList.toggle('is-immersed', on);
       document.dispatchEvent(new CustomEvent('mai:film', { detail: { immersive: on } }));
     };
-    const tl = gsap.timeline({
-      defaults: { ease: 'power2.inOut' },
-      scrollTrigger: {
-        trigger: figure,
-        start: 'top top',
-        end: '+=140%',
-        pin: true,
-        scrub: 0.5,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => announce(self.progress > 0.32 && self.progress < 0.97),
-        onLeave: () => announce(false),
-        onLeaveBack: () => announce(false),
-      },
+    // The card's own size, from the CSS (min(100vw - 2 × gutter, 380px), 9:16).
+    const cardW = () => Math.min(innerWidth - 2 * parseFloat(getComputedStyle(document.querySelector('.container')).paddingLeft), 380);
+    // Holds the screen while the ceremony plays, then lets go.
+    ScrollTrigger.create({
+      trigger: figure,
+      start: 'top top',
+      end: '+=110%',
+      pin: true,
+      onEnterBack: () => announce(true),
+      onLeave: () => announce(false),
     });
-    tl.to(frame, { width: () => innerWidth, height: () => innerHeight, borderRadius: 0, boxShadow: 'none', duration: 1 })
-      .to(figure.querySelector('.film__backdrop'), { autoAlpha: 1, duration: 1 }, 0)
-      .to(figure.querySelector('figcaption'), { autoAlpha: 0, y: -20, duration: 0.4 }, 0)
-      .to({}, { duration: 1.6 })
-      .to(frame, { scale: 0.92, borderRadius: 30, duration: 0.6 });
-    return () => announce(false);
+    // From the moment it comes into view it grows, filling the screen exactly as it arrives.
+    gsap
+      .timeline({
+        scrollTrigger: {
+          trigger: figure,
+          start: 'top 95%',
+          end: 'top top',
+          scrub: 0.3,
+          invalidateOnRefresh: true,
+          // Pause once it's a quarter of the way in, and it glides the rest of the way to full screen.
+          snap: { snapTo: (v) => (v > 0.25 ? 1 : 0), delay: 0.12, duration: { min: 0.3, max: 0.8 }, ease: 'power2.inOut' },
+          onUpdate: (self) => announce(self.progress > 0.7),
+        },
+      })
+      .fromTo(
+        frame,
+        { width: cardW, height: () => (cardW() * 16) / 9, borderRadius: 30 },
+        { width: () => innerWidth, height: () => innerHeight, borderRadius: 0, ease: 'none' },
+      )
+      .fromTo(backdrop, { autoAlpha: 0 }, { autoAlpha: 1, ease: 'none' }, 0)
+      .to(caption, { autoAlpha: 0, duration: 0.4, ease: 'none' }, 0);
+    return () => {
+      announce(false);
+      gsap.set(frame, { clearProps: 'width,height,borderRadius' });
+    };
   });
 }
 
@@ -197,18 +218,31 @@ function reveals() {
       gsap.to(batch, { y: 0, autoAlpha: 1, duration: 1.25, ease: 'expo.out', stagger: 0.09, overwrite: true }),
   });
 
-  // Headings rise line by line through masks. Split at the moment they appear (so in
-  // whatever language is showing), and put back as plain text once they're up.
+  // Headings rise line by line through masks. Split once the page's language is in place
+  // and the heading appears, then put back as plain text (re-translated, in case the
+  // language changed meanwhile).
   gsap.utils.toArray(LINE_REVEAL).forEach((heading) => {
     ScrollTrigger.create({
       trigger: heading,
       start: 'top 90%',
       once: true,
-      onEnter: () => {
-        const split = SplitText.create(heading, { type: 'lines', mask: 'lines' });
-        gsap.set(heading, { y: 0, autoAlpha: 1 });
-        gsap.from(split.lines, { yPercent: 115, rotate: 2, transformOrigin: '0% 100%', duration: 1.35, stagger: 0.12, ease: 'expo.out', onComplete: () => split.revert() });
-      },
+      onEnter: () =>
+        langReady.then(() => {
+          const split = SplitText.create(heading, { type: 'lines', mask: 'lines' });
+          gsap.set(heading, { y: 0, autoAlpha: 1 });
+          gsap.from(split.lines, {
+            yPercent: 115,
+            rotate: 2,
+            transformOrigin: '0% 100%',
+            duration: 1.35,
+            stagger: 0.12,
+            ease: 'expo.out',
+            onComplete: () => {
+              split.revert();
+              translate(heading);
+            },
+          });
+        }),
     });
   });
 

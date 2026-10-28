@@ -26,6 +26,9 @@ const FONTS = {
 
 const dictionaries = import.meta.glob('./i18n/*.json', { import: 'default' });
 let dict = {};
+let markReady;
+/** Resolves once the first language has been applied to the page. */
+export const ready = new Promise((r) => (markReady = r));
 
 export const langInfo = (code) => LANGS.find((l) => l.code === code);
 const valid = (code) => !!langInfo(code);
@@ -93,6 +96,7 @@ export async function setLang(code, { persist = true } = {}) {
     } catch {}
   }
   root.classList.remove('i18n-pending');
+  markReady();
   document.dispatchEvent(new CustomEvent('langchange', { detail: { lang: code } }));
 }
 
