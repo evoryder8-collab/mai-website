@@ -29,8 +29,9 @@ home, and the nav link matching `<body data-page>` gets `aria-current="page"`. N
   the HTML and is the default; every translatable element has `data-t="key"` and the active dictionary fills it. Page
   titles/descriptions are `meta-<page>-title/desc`. Chinese, Korean and Thai load Noto fonts only when chosen.
   The non-Japanese translations were written by Claude and should be checked by native speakers before launch.
-- **Sound** (`src/sound.js`): synthesised with Web Audio, no audio files: ambient drone and singing bowls, taps, sash
-  whooshes, the map flight, the Yu-fai fire crackle. Header speaker toggles it; the choice is remembered.
+- **Sound** (`src/sound.js`): one Web Audio mix. Her background music (`src/assets/mai-music.mp3`, 40%, resumes across
+  pages), Latte's and Mugi's barks, and synthesised taps, sash whooshes, bowls and the map flight. Header speaker
+  toggles it; the choice is remembered.
 
 ## Stack
 

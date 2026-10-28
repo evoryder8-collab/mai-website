@@ -1,7 +1,6 @@
 // Sound: her background music ("Weightless Clouds 2", looping at 40% to start with, picking
 // up on each page where the last one left off), soft synthesised sounds for touches,
-// flings, the map flight and the Yu-fai fire, and Latte's and Mugi's barks, all through
-// one Web Audio mix. Nothing plays until the visitor says yes (portal or header
+// flings and the map flight, and Latte's and Mugi's barks, all through one Web Audio mix. Nothing plays until the visitor says yes (portal or header
 // speaker); the choice is remembered. On later pages browsers only allow audio after a
 // tap, so the music fades in on the first one.
 
@@ -32,7 +31,6 @@ let sfxBus;
 let reverb;
 let noise;
 let music = null;
-let fire = null;
 let lastHover = 0;
 let analyser = null;
 let meter = null;
@@ -43,7 +41,9 @@ function graph() {
   if (ctx) return ctx;
   const AC = window.AudioContext || window.webkitAudioContext;
   if (!AC) return null;
-  ctx = new AC();
+  // A roomier buffer than the default: nothing here needs split-second timing, and on a busy
+  // phone a short buffer runs dry and crackles.
+  ctx = new AC({ latencyHint: 'playback' });
   master = ctx.createGain();
   master.gain.value = 0;
   const limiter = ctx.createDynamicsCompressor();
@@ -180,7 +180,6 @@ export const sound = {
     } else if (ctx) {
       master.gain.setTargetAtTime(0, now(), 0.25);
       stopMusic();
-      sound.fire(false);
     }
     listeners.forEach((fn) => fn(enabled));
   },
@@ -302,44 +301,6 @@ export const sound = {
     src.stop(now() + dur + 0.1);
   },
 
-  /** The Yu-fai fire: crackles over a low warm rumble while it's on screen. */
-  fire(on) {
-    if (!on || !ready()) {
-      if (fire) {
-        clearTimeout(fire.timer);
-        fire.gain.gain.setTargetAtTime(0, now(), 0.3);
-        fire.src.stop(now() + 1.5);
-        fire = null;
-      }
-      return;
-    }
-    if (fire) return;
-    const src = noiseSource();
-    const low = ctx.createBiquadFilter();
-    const gain = ctx.createGain();
-    low.type = 'lowpass';
-    low.frequency.value = 180;
-    gain.gain.value = 0;
-    gain.gain.setTargetAtTime(0.05, now(), 0.8);
-    src.connect(low).connect(gain).connect(ambientBus);
-    src.start();
-    const crack = () => {
-      if (!fire) return;
-      const s = noiseSource();
-      const hp = ctx.createBiquadFilter();
-      const g = ctx.createGain();
-      hp.type = 'highpass';
-      hp.frequency.value = 1200 + Math.random() * 2500;
-      envelope(g, 0.02 + Math.random() * 0.05, 0.001, 0.01 + Math.random() * 0.04);
-      s.connect(hp).connect(g).connect(sfxBus);
-      s.start(now(), Math.random() * 1.5);
-      s.stop(now() + 0.08);
-      fire.timer = setTimeout(crack, 30 + Math.random() * (Math.random() < 0.2 ? 400 : 120));
-    };
-    fire = { src, gain, timer: 0 };
-    crack();
-  },
-
   /** Lower the ambience while the award film plays with its own sound. */
   duck(on) {
     if (!ctx) return;
@@ -375,13 +336,4 @@ export function initSound() {
   document.addEventListener('mai:fly', () => sound.whoosh({ dur: 5.5, from: 120, to: 900, gain: 0.07 }));
   document.addEventListener('mai:arrive', () => sound.bowl({ freq: 220, gain: 0.08, pan: 0 }));
   document.addEventListener('mai:chooser', () => sound.chime());
-
-  const fireEl = document.querySelector('[data-fire]');
-  if (fireEl) new IntersectionObserver(([en]) => sound.fire(en.isIntersecting), { threshold: 0.35 }).observe(fireEl);
-  sound.onChange((on) => {
-    if (on && fireEl) {
-      const r = fireEl.getBoundingClientRect();
-      sound.fire(r.top < innerHeight && r.bottom > 0);
-    }
-  });
 }
