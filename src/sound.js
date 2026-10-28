@@ -1,8 +1,11 @@
 // Sound: her background music ("Weightless Clouds 2", looping at 40% to start with, picking
 // up on each page where the last one left off), soft synthesised sounds for touches,
-// flings and the map flight, and Latte's and Mugi's barks, all through one Web Audio mix. Nothing plays until the visitor says yes (portal or header
-// speaker); the choice is remembered. On later pages browsers only allow audio after a
-// tap, so the music fades in on the first one.
+// flings and the map flight, and Latte's and Mugi's barks, all through one Web Audio mix.
+// Nothing plays until the visitor says yes (portal or header speaker); the choice is
+// remembered. On later pages browsers only allow audio after a tap, so the music fades in
+// on the first one. iPhones let one thing play sound at a time: the award film pauses the
+// music (and may suspend the mix), and once the film stops the music fades back in where
+// it was.
 
 import musicUrl from './assets/mai-music.mp3';
 
@@ -32,6 +35,7 @@ let reverb;
 let noise;
 let music = null;
 let startingOver = false;
+let ducked = false;
 let lastHover = 0;
 let analyser = null;
 let meter = null;
@@ -80,7 +84,7 @@ function graph() {
       music?.el.pause();
     } else {
       ctx.resume();
-      music?.el.play().catch(() => {});
+      wake();
     }
   });
   return ctx;
@@ -122,6 +126,8 @@ function startMusic() {
     music = { el, gain };
   }
   music.gain.gain.cancelScheduledValues(now());
+  // Stopped (by us, the tab or the phone): it comes back from silence, not at full level.
+  if (music.el.paused) music.gain.gain.setValueAtTime(0, now());
   music.gain.gain.setTargetAtTime(MUSIC_VOLUME, now(), 1.2);
   music.el.play().catch(() => {});
 }
@@ -132,6 +138,20 @@ function stopMusic() {
   music.gain.gain.setTargetAtTime(0, now(), 0.4);
   const { el } = music;
   setTimeout(() => !enabled && el.pause(), 1600);
+}
+
+// Bring the sound back wherever it was stopped for us: a new page waiting for a tap, a
+// hidden tab, or the film having had the speaker. Not while the film still has it.
+function wake() {
+  if (!enabled || ducked || !graph()) return;
+  ctx
+    .resume()
+    .then(() => {
+      if (!enabled || ducked) return;
+      master.gain.setTargetAtTime(1, now(), 0.6);
+      if (!music || music.el.paused) startMusic();
+    })
+    .catch(() => {});
 }
 
 function bowl({ freq = PENTATONIC[Math.floor(Math.random() * PENTATONIC.length)], gain = 0.06, pan = Math.random() - 0.5 } = {}) {
@@ -312,26 +332,24 @@ export const sound = {
     } catch {}
   },
 
-  /** Lower the ambience while the award film plays with its own sound. */
+  /** Lower the music while the award film plays with its own sound, and bring it back after. */
   duck(on) {
+    if (on === ducked) return;
+    ducked = on;
     if (!ctx) return;
-    ambientBus.gain.setTargetAtTime(on ? 0.12 : 1, now(), 0.5);
+    ambientBus.gain.setTargetAtTime(on ? 0.12 : 1, now(), on ? 0.5 : 0.9);
+    if (!on) wake();
   },
 };
 
 /** Restore an earlier "yes" (after the first tap on this page), and wire the site's events to sounds. */
 export function initSound() {
-  if (enabled && graph()) {
-    const wake = () => {
-      ctx.resume().then(() => {
-        if (!enabled) return;
-        master.gain.setTargetAtTime(1, now(), 0.6);
-        startMusic();
-      });
-    };
-    wake();
-    ['pointerdown', 'keydown', 'touchend'].forEach((type) => addEventListener(type, wake, { once: true, capture: true }));
-  }
+  wake();
+  // Any tap or key brings back sound the browser has stopped (and lets a new page start it).
+  const nudge = () => {
+    if (enabled && !ducked && (!ctx || ctx.state !== 'running' || !music || music.el.paused)) wake();
+  };
+  ['pointerdown', 'keydown', 'touchend'].forEach((type) => addEventListener(type, nudge, { capture: true, passive: true }));
 
   const touchable = '.btn, .more, .teaser, .choice__option, .map-replay, .nav__list a, .lang-trigger, .sound-toggle, .poster-link, .map-pin';
   document.addEventListener('pointerdown', (e) => {
