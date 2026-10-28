@@ -1,17 +1,15 @@
-// Satin along the edges of Mai's photos. Each photo keeps its own shape; along its edges
-// lies a ribbon of the same cream-and-gold satin as the background, like a rolled satin
-// hem the photo is tucked into. Gathers run around it, its outer edge ripples, its folds
-// catch the light, it unfurls with the photo's reveal, and scrolling moves it like cloth
-// on a spring: it trails behind the motion, overshoots and settles. A finger or cursor
-// nearby lifts it a little. One small canvas beside each photo, drawing only the strips
-// along its edges, and only while it is on screen.
+// Mai's photos rest on satin. Each photo keeps its own shape and edge; underneath it the
+// same cream satin as the background gathers softly, in folds that fan out from under its
+// edges and fade into the background, with a soft shadow where the photo lies on the
+// cloth. Scrolling sends a ripple out through the folds and slides them along; they
+// trail the motion on a spring and settle. A finger or cursor nearby lifts the cloth a
+// little. One small canvas behind each photo, drawing only the strips around its edges,
+// and only while it is on screen.
 
 const PHOTOS = [
   // selector, edges with satin [left, right, bottom, top]
-  ['.float-card__frame', [1, 1, 1, 1]],
   ['.about__photo .frame, .treatment__photo .frame', [1, 1, 1, 1]],
   ['.band__media', [0, 0, 1, 1]],
-  ['.teaser__visual', [0, 0, 1, 0]],
   ['.dog__medal', [1, 1, 1, 1]],
 ];
 
@@ -33,9 +31,9 @@ varying vec2 vP;
 uniform vec2 uHalf;
 uniform float uRadius;
 uniform vec4 uEdges;    // left, right, bottom, top
-uniform float uWidth;   // the ribbon's resting width, CSS px
+uniform float uReach;   // how far the cloth shows around the photo, CSS px
 uniform float uPerim;   // length of the outline
-uniform vec2 uK;        // gathers, ripples: whole waves around the outline
+uniform float uK;       // gathers: whole folds around the outline
 uniform float uTime;
 uniform float uTravel;  // how far the cloth has moved along with the scroll
 uniform float uLag;     // spring: how far the cloth trails the scroll (signed)
@@ -101,6 +99,8 @@ void main() {
   vec2 p = vP;
   vec2 q = abs(p) - (uHalf - uRadius);
   float d = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - uRadius;
+  // The photo covers everything inside its own outline.
+  if (d < 0.0) discard;
 
   float s;
   vec2 n;
@@ -109,71 +109,59 @@ void main() {
   if (e < 0.001) discard;
 
   // Slow, organic variation around the outline that joins up seamlessly where it began.
-  float ang = s / uPerim * 2.0 * PI;
-  float R = uPerim / (2.0 * PI) / 140.0;
   float t = uTime;
-  float n1 = snoise(vec2(cos(ang), sin(ang)) * R + vec2(t * 0.11, uTravel * 0.08));
+  float ang = s / uPerim * 2.0 * PI;
+  float R = uPerim / (2.0 * PI) / 160.0;
+  float n1 = snoise(vec2(cos(ang), sin(ang)) * R + vec2(t * 0.06, uTravel * 0.05));
 
-  // Gathers: folds of uneven spacing that travel around the photo as the page scrolls.
-  float ph = s * uK.x + n1 * 1.8 + 0.9 * sin(s * uK.x * 0.37 + t * 0.3) - uTravel * 1.4 + t * 0.2;
-  float fold = sin(ph);
-
-  // The ribbon's width: breathing, ruffling where the folds open, trailing the scroll on a
-  // spring, lifting toward the finger.
-  float w = uWidth * (0.74 + 0.26 * n1 + 0.2 * sin(s * uK.y - uTravel * 1.1 + t * 0.7) * (0.5 + uEnergy));
-  w *= 1.0 + 0.16 * fold * (0.7 + 0.5 * uEnergy);
-  w += uWidth * uLag * n.y * 0.95;
+  // How far the cloth shows: a little further where it bunches, further on the side that
+  // trails the scroll, and lifted toward the finger.
   vec2 dp = p - uPointer.xy;
-  w += uWidth * 0.7 * uPointer.z * exp(-dot(dp, dp) / 3600.0);
-  w = max(w, uWidth * 0.3) * e;
+  float reach = uReach * (0.85 + 0.15 * n1) * (1.0 + 0.45 * uLag * n.y);
+  reach *= 1.0 + 0.35 * uPointer.z * exp(-dot(dp, dp) / 4000.0);
+  reach *= e;
+  float x = d / max(reach, 1.0);
+  if (x >= 1.0) discard;
+  float fall = 1.0 - x;
 
-  // Its inner edge follows the photo's own outline exactly, overlapping it by a hair.
-  float d0 = -1.0;
-  float cover = smoothstep(d0 - 0.6, d0 + 0.6, d) * (1.0 - smoothstep(w - 0.8, w + 0.6, d));
-  float x = clamp((d - d0) / max(w - d0, 1.0), 0.0, 1.0);
+  // Gathers: folds of uneven spacing fanning out from under the photo, sliding around it
+  // with the scroll. Their spacing tightens with distance, so further round the outline
+  // they turn into fine ripples running along the edge, like satin settling outward.
+  // And a ripple the scroll sends out through the cloth.
+  float ph = s * uK * (1.0 - 0.35 * x) + n1 * 2.4 + 0.8 * sin(s * uK * 0.41 + t * 0.2) - uTravel * 0.9;
+  float ripple = sin(d * 0.16 - t * 5.0) * uEnergy * fall;
+  float amp = (0.5 + 0.6 * uEnergy) * smoothstep(0.0, 0.18, x) * fall;
 
-  // The surface: a gentle roll across the ribbon, and the folds fanning open toward its
-  // outer edge, so the light runs across it in long satin streaks.
+  // The surface: rising to meet the photo's edge, with the folds across it.
   vec2 tng = vec2(-n.y, n.x);
-  float fan = 0.3 + 0.7 * x;
-  vec3 N = normalize(vec3(-n * cos(PI * x) * 0.4 + tng * cos(ph) * (0.55 + 0.45 * uEnergy) * fan, 1.0));
+  vec3 N = normalize(vec3(tng * cos(ph) * amp + n * (0.55 * fall * fall + 0.35 * ripple), 1.0));
   vec3 L = normalize(vec3(-0.45, -0.7, 0.75));
   vec3 H = normalize(L + vec3(0.0, 0.0, 1.0));
   float diff = clamp(dot(N, L), 0.0, 1.0);
   float nh = max(dot(N, H), 0.0);
 
-  // The background's broad satin light drifting across it.
-  vec2 c = (p + vec2(0.0, uTravel * 40.0)) / 360.0;
-  float flow = 0.5 + 0.5 * sin((c.x * 1.2 + c.y * 0.8 + snoise(c * 0.9 + t * 0.04) * 1.5) * 2.4 + t * 0.35);
-  // And the background's layered sheen, along each fold.
-  float shine = 0.5 + 0.5 * sin(ph + 1.1 + flow * 1.4);
-
-  vec3 shade = vec3(0.56, 0.43, 0.3);
-  vec3 sand = vec3(0.87, 0.77, 0.62);
-  vec3 linen = vec3(0.95, 0.9, 0.82);
-  vec3 cream = vec3(1.0, 0.985, 0.955);
+  // In the background's own colours, so it melts into it.
+  vec3 sand = vec3(0.855, 0.79, 0.695);
+  vec3 linen = vec3(0.945, 0.915, 0.865);
+  vec3 cream = vec3(1.0, 0.99, 0.965);
   vec3 gold = vec3(0.97, 0.72, 0.32);
-  vec3 col = mix(sand, linen, smoothstep(0.2, 0.95, diff));
-  col = mix(col, shade, pow(1.0 - diff, 1.8) * 0.62);
-  col = mix(col, cream, pow(shine, 6.0) * (0.35 + 0.35 * flow) * fan);
-  col = mix(col, cream, pow(nh, 10.0) * 0.45);
-  col += gold * pow(shine, 24.0) * 0.16 * (0.5 + flow);
-  col += vec3(1.0) * pow(shine, 70.0) * 0.1 * fan;
+  vec3 col = mix(sand, linen, smoothstep(0.35, 0.95, diff));
+  col *= 1.0 - (0.5 - 0.5 * sin(ph)) * amp * 0.12;
+  col = mix(col, cream, pow(nh, 16.0) * 0.7);
+  col += gold * pow(nh, 48.0) * 0.14;
+  col += vec3(1.0) * pow(nh, 140.0) * 0.12;
+  float cloth = pow(fall, 1.6) * 0.92;
 
-  // Shade: a soft line where the photo tucks under the satin, and a little on the page below.
-  float under = smoothstep(-9.0, d0, d) * (1.0 - step(d0, d)) * 0.26;
-  float drop = (1.0 - smoothstep(w, w + 14.0, d - 2.0)) * step(w, d) * 0.2;
-  float shadow = (under + drop) * e;
+  // Where the photo lies on the cloth: a soft, warm contact shadow, deeper below.
+  float shade = (0.3 * exp(-d / 5.0) + 0.13 * exp(-d / 18.0)) * (0.75 + 0.45 * max(n.y, 0.0)) * e;
   vec3 dark = vec3(0.16, 0.1, 0.06);
 
-  // It unfurls with the photo's reveal, and once that is done lies along the top too.
+  // It appears with the photo's reveal, and once that is done lies along the top too.
   float shown = smoothstep(uClip - 2.0, uClip + 26.0, p.y + uHalf.y + 90.0 * (1.0 - smoothstep(0.0, 60.0, uClip)));
-  cover *= shown;
-  shadow *= shown;
+  cloth *= shown;
+  shade *= shown;
 
-  float alpha = cover + shadow * (1.0 - cover);
-  vec3 rgb = col * cover + dark * shadow * (1.0 - cover);
-  gl_FragColor = vec4(rgb, alpha);
+  gl_FragColor = vec4(dark * shade + col * cloth * (1.0 - shade), shade + cloth * (1.0 - shade));
 }`;
 
 // The scroll, shared by every photo: a damped spring the cloth follows, so it trails the
@@ -259,19 +247,17 @@ function mount(el, edges, { reduceMotion }) {
   gl.enableVertexAttribArray(loc);
   gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
   const U = Object.fromEntries(
-    ['uCanvas', 'uHalf', 'uBleed', 'uRadius', 'uEdges', 'uWidth', 'uPerim', 'uK', 'uTime', 'uTravel', 'uLag', 'uEnergy', 'uPointer', 'uClip'].map((k) => [k, gl.getUniformLocation(prog, k)]),
+    ['uCanvas', 'uHalf', 'uBleed', 'uRadius', 'uEdges', 'uReach', 'uPerim', 'uK', 'uTime', 'uTravel', 'uLag', 'uEnergy', 'uPointer', 'uClip'].map((k) => [k, gl.getUniformLocation(prog, k)]),
   );
   gl.uniform4f(U.uEdges, ...edges);
   gl.clearColor(0, 0, 0, 0);
 
-  // Same place in 3D as the photo (the hero's photo floats in front of its glass).
-  const { translate } = getComputedStyle(el);
-  if (translate && translate !== 'none') canvas.style.translate = translate;
-  el.after(canvas);
+  // Just before the photo, so the photo lies on top of it.
+  el.before(canvas);
 
   let W = 0;
   let H = 0;
-  let width = 0;
+  let reach = 0;
   let verts = 0;
   const layout = () => {
     W = el.offsetWidth;
@@ -279,9 +265,10 @@ function mount(el, edges, { reduceMotion }) {
     if (!W || !H) return;
     const radius = getComputedStyle(el).borderTopLeftRadius;
     const r = Math.min((parseFloat(radius) || 0) * (radius.endsWith('%') ? Math.min(W, H) / 100 : 1), W / 2, H / 2);
-    width = Math.max(10, Math.min(22, Math.min(W, H) * 0.05));
-    const bleed = Math.ceil(width * 3.2 + 14);
-    const inner = Math.min(Math.ceil(10 + 0.3 * r), Math.floor(Math.min(W, H) / 2));
+    reach = Math.max(28, Math.min(72, Math.min(W, H) * 0.16));
+    const bleed = Math.ceil(reach * 2.1);
+    // Inside the photo's box only its rounded corners need drawing around.
+    const inner = Math.ceil(0.3 * r) + 2;
     const cw = W + 2 * bleed;
     const ch = H + 2 * bleed;
     Object.assign(canvas.style, {
@@ -316,7 +303,7 @@ function mount(el, edges, { reduceMotion }) {
     gl.uniform1f(U.uBleed, bleed);
     gl.uniform1f(U.uRadius, r);
     gl.uniform1f(U.uPerim, perim);
-    gl.uniform2f(U.uK, waves(64), waves(150));
+    gl.uniform1f(U.uK, waves(46));
     draw(performance.now());
   };
 
@@ -342,7 +329,7 @@ function mount(el, edges, { reduceMotion }) {
     if (!verts) return;
     const grow = reduceMotion ? 1 : 1 - Math.pow(1 - Math.min(1, (now - born) / 1600), 3);
     pointer.on += (pointer.ton - pointer.on) * 0.08;
-    gl.uniform1f(U.uWidth, width * grow);
+    gl.uniform1f(U.uReach, reach * grow);
     gl.uniform1f(U.uTime, reduceMotion ? 6 : clock);
     gl.uniform1f(U.uTravel, reduceMotion ? 0 : spring.travel);
     gl.uniform1f(U.uLag, reduceMotion ? 0 : spring.x);

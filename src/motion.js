@@ -92,17 +92,7 @@ function intro() {
       .from(card.querySelector('img'), { scale: 1.3, duration: 2.4 }, 0.3)
       .from(card.querySelector('figcaption'), { autoAlpha: 0, x: -36, duration: 1.3 }, 1.15);
   }
-  const name = document.querySelector('[data-intro-name]');
-  if (name) {
-    const split = SplitText.create(name, { type: 'chars', charsClass: 'char' });
-    tl.from(split.chars, { yPercent: 105, duration: 1.5, stagger: 0.09 }, 0.35);
-    // Once the letters are up, "Mai" catches the same gold gleam as the logo.
-    tl.add(() => {
-      split.revert();
-      name.classList.add('is-gleaming');
-    }, '>');
-  }
-  tl.from('[data-intro]', { y: 26, autoAlpha: 0, duration: 1.3, stagger: 0.08 }, name ? 0.55 : 0.2);
+  tl.from('[data-intro]', { y: 26, autoAlpha: 0, duration: 1.3, stagger: 0.08 }, card ? 0.4 : 0.2);
   // Visit: the map panel rises in like the AusMC venue map.
   const panel = document.querySelector('[data-map-panel]');
   if (panel) tl.from(panel, { y: 80, scale: 0.94, autoAlpha: 0, duration: 1.6, clearProps: 'transform' }, 0.25);
