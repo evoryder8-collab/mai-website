@@ -24,7 +24,8 @@ home, and the nav link matching `<body data-page>` gets `aria-current="page"`. N
 
 - **Portal** (`src/portal.js`): the first page of a visit opens on "Sound on?" (big Yes, small No), then a language
   picker that suggests the device's language and picks it after 5 seconds (Japanese if the device's language isn't one of
-  the eight). Shown once per browser session; `?portal=off` skips it, `?lang=fr` (etc.) presets the language.
+  the eight). Shown once per browser session (so a refresh skips it); the header logo plays it again from the top of
+  Home. `?portal=off` skips it, `?lang=fr` (etc.) presets the language.
 - **Languages** (`src/lang.js`, `src/i18n/*.json`): ja, en, zh (Simplified), ko, th, fr, de, it. Japanese is written in
   the HTML and is the default; every translatable element has `data-t="key"` and the active dictionary fills it. Page
   titles/descriptions are `meta-<page>-title/desc`. Chinese, Korean and Thai load Noto fonts only when chosen.

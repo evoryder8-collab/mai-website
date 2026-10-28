@@ -31,6 +31,7 @@ let sfxBus;
 let reverb;
 let noise;
 let music = null;
+let startingOver = false;
 let lastHover = 0;
 let analyser = null;
 let meter = null;
@@ -108,6 +109,7 @@ function startMusic() {
       } catch {}
     }, { once: true });
     const remember = () => {
+      if (startingOver) return;
       try {
         sessionStorage.setItem(MUSIC_AT, String(el.currentTime));
       } catch {}
@@ -299,6 +301,15 @@ export const sound = {
     g.connect(reverb);
     src.start();
     src.stop(now() + dur + 0.1);
+  },
+
+  /** Back to how a visit begins: silent until the visitor says yes, the music from the top. */
+  startOver() {
+    startingOver = true;
+    sound.set(false);
+    try {
+      sessionStorage.removeItem(MUSIC_AT);
+    } catch {}
   },
 
   /** Lower the ambience while the award film plays with its own sound. */

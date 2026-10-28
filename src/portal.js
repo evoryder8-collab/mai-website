@@ -312,6 +312,27 @@ export function initPortal({ lenis, reduceMotion, onEnter }) {
   document.addEventListener('langchange', () => syncSpeaker(sound.on));
   syncSpeaker(sound.on);
 
+  // Header logo: the opening plays again, from the top of Home, as on a first visit. (It
+  // only comes once per tab, so a refresh skips it.) Her logo fades in on linen, as the
+  // next page's first paint will show it, and the page reloads behind it.
+  document.querySelector('.brand')?.addEventListener('click', (e) => {
+    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    const home = e.currentTarget.href;
+    try {
+      sessionStorage.removeItem('mai-entered');
+    } catch {}
+    sound.startOver();
+    root.classList.add('portal-pending', 'portal-replay');
+    const go = () => {
+      if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
+      else scrollTo(0, 0);
+      location.assign(home);
+    };
+    if (reduceMotion) go();
+    else setTimeout(go, 500);
+  });
+
   if (!root.classList.contains('portal-pending')) {
     resolveEntered();
     return false;

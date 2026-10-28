@@ -1097,6 +1097,9 @@ html.portal-pending body::before {
   content: ''; position: fixed; inset: 0; z-index: 400; visibility: visible;
   background: url('../assets/mai-logo-720.webp') center / min(68vw, 360px) auto no-repeat, var(--linen);
 }
+/* The header logo replays the opening: the same splash fades in over the page first. */
+html.portal-replay body::before { animation: splash-in 0.45s ease both; }
+@keyframes splash-in { from { opacity: 0; } }
 .portal {
   position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none;
   margin: 0; padding: 0; border: 0;
