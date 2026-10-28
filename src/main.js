@@ -1,6 +1,7 @@
 import { initButtons } from './buttons.js';
 import { initDirections } from './directions.js';
 import { initLang, getLang } from './lang.js';
+import { initLiquid } from './liquid.js';
 import { initNav } from './nav.js';
 import { initMotion, ScrollTrigger } from './motion.js';
 import { entered, initPortal } from './portal.js';
@@ -11,6 +12,7 @@ import { initVideo } from './video.js';
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const welcoming = document.documentElement.classList.contains('portal-pending');
 
+initLiquid({ reduceMotion });
 initLang();
 const { lenis, playIntro } = initMotion({ reduceMotion, deferIntro: welcoming });
 initNav({ lenis });

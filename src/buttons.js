@@ -1,10 +1,30 @@
 // Buttons with some life: a ripple from wherever they're pressed (phones too), and on
 // desktop a magnetic pull toward the pointer that springs back when it leaves.
 // The press-in and the light sweep across saffron buttons are CSS (main.css).
+// Glass surfaces also catch the light where the finger or cursor is (--mx/--my/--lit).
 import { gsap } from './motion.js';
+
+const GLASS = '.glass-panel, .glass-chip, .float-card__caption, .teaser, .lang-tile, .choice__option';
 
 export function initButtons({ reduceMotion }) {
   const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  document.addEventListener(
+    'pointermove',
+    (e) => {
+      const glass = e.target.closest?.(GLASS);
+      if (!glass) return;
+      const r = glass.getBoundingClientRect();
+      glass.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      glass.style.setProperty('--my', `${e.clientY - r.top}px`);
+      glass.style.setProperty('--lit', '1');
+    },
+    { passive: true },
+  );
+  document.addEventListener('pointerout', (e) => {
+    const glass = e.target.closest?.(GLASS);
+    if (glass && !glass.contains(e.relatedTarget)) glass.style.setProperty('--lit', '0');
+  });
 
   document.addEventListener('pointerdown', (e) => {
     const btn = e.target.closest('.btn, .map-replay, .choice__option');

@@ -67,6 +67,9 @@ body {
 }
 html:is(:lang(ja), :lang(zh), :lang(ko)) body { line-height: 1.95; letter-spacing: 0.03em; font-feature-settings: 'palt' 0; }
 
+/* The living Liquid Glass background (liquid.js), behind every page. */
+.liquid-bg { position: fixed; inset: 0; z-index: -1; width: 100%; height: 100%; max-width: none; pointer-events: none; }
+
 /* Paper grain over everything. */
 body::after {
   content: '';
@@ -357,6 +360,12 @@ html:lang(ja) :is(h1, h2, h3, .band__line, .hero__lead) { word-break: auto-phras
   color: var(--ink);
 }
 .hero__name .char { display: inline-block; }
+/* After the intro, the giant name catches a slow gold gleam and breathes like the logo. */
+.hero__name.is-gleaming {
+  background: linear-gradient(100deg, var(--ink) 0 40%, #b9740a 45%, #fff1c9 50%, #e9a21b 55%, var(--ink) 60% 100%) 100% 0 / 300% 100%;
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: logo-gleam 9s var(--ease) 0.6s infinite, logo-breathe 5.5s ease-in-out infinite;
+}
 
 .hero__role p:first-child { font-family: var(--f-serif); font-size: clamp(1.35rem, 2.3vw, 1.8rem); line-height: 1.3; font-weight: 500; }
 html:is(:lang(ja), :lang(zh), :lang(ko)) .hero__role p:first-child { font-family: var(--f-mincho); letter-spacing: 0.08em; }
@@ -721,7 +730,7 @@ html:is(:lang(ja), :lang(zh), :lang(ko)) .treatment__meaning { font-family: var(
 html:is(:lang(ja), :lang(zh), :lang(ko)) .menu-note p { font-family: var(--f-mincho); font-size: 1.05rem; line-height: 1.8; }
 
 /* ---------- Visit ---------- */
-.visit { background: var(--paper); }
+.visit { background: rgb(250 246 239 / 0.5); }
 .visit__grid { display: grid; gap: 3.5rem; }
 @media (min-width: 960px) {
   .visit__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(3rem, 7vw, 7rem); align-items: start; }
@@ -843,6 +852,16 @@ html:is(:lang(ja), :lang(zh), :lang(ko)) .menu-note p { font-family: var(--f-min
   line-height: 1.3; color: var(--ink);
 }
 .glass-chip__title { font-family: var(--f-serif); font-size: 1.05rem; font-weight: 500; }
+
+/* Glass catches the light where the finger or cursor is (buttons.js sets --mx/--my/--lit).
+   Each of these is its own stacking context, so the light sits under the text. */
+.glass-panel, .teaser { position: relative; }
+:is(.glass-panel, .glass-chip, .float-card__caption, .teaser, .lang-tile, .choice__option)::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(240px circle at var(--mx, 50%) var(--my, 0%), rgb(255 255 255 / 0.62), rgb(255 250 238 / 0.18) 45%, transparent 70%);
+  opacity: var(--lit, 0);
+  transition: opacity 0.7s var(--ease);
+}
 .glass-chip__sub { font-size: 0.78rem; letter-spacing: 0.05em; color: var(--ink-2); }
 
 /* ---------- Links to the dedicated pages ---------- */
@@ -920,7 +939,7 @@ html:is(:lang(ja), :lang(zh), :lang(ko)) .more { font-family: var(--f-mincho); f
 }
 
 /* Home: Visit. */
-.visit--teaser { background: var(--paper); }
+.visit--teaser { background: rgb(250 246 239 / 0.5); }
 .visit-teaser { display: grid; gap: 2.5rem; align-items: center; }
 @media (min-width: 960px) { .visit-teaser { grid-template-columns: 1fr 1fr; gap: clamp(3rem, 7vw, 7rem); } }
 .visit-teaser__card { padding: clamp(1.4rem, 3vw, 2.4rem); }

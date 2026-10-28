@@ -30,6 +30,8 @@ let drone = null;
 let bowlTimer = 0;
 let fire = null;
 let lastHover = 0;
+let analyser = null;
+let meter = null;
 const listeners = new Set();
 
 function graph() {
@@ -42,6 +44,10 @@ function graph() {
   const limiter = ctx.createDynamicsCompressor();
   limiter.threshold.value = -12;
   master.connect(limiter).connect(ctx.destination);
+  analyser = ctx.createAnalyser();
+  analyser.fftSize = 512;
+  meter = new Float32Array(analyser.fftSize);
+  master.connect(analyser);
   ambientBus = ctx.createGain();
   sfxBus = ctx.createGain();
   ambientBus.connect(master);
@@ -184,6 +190,15 @@ export const sound = {
 
   onChange(fn) {
     listeners.add(fn);
+  },
+
+  /** How loud the soundscape is right now, roughly 0..1 (the background breathes with it). */
+  level() {
+    if (!ready() || !analyser) return 0;
+    analyser.getFloatTimeDomainData(meter);
+    let sum = 0;
+    for (let i = 0; i < meter.length; i++) sum += meter[i] * meter[i];
+    return Math.min(1, Math.sqrt(sum / meter.length) * 6);
   },
 
   /** Wooden "tok" for touches. */

@@ -94,6 +94,11 @@ function intro() {
   if (name) {
     const split = SplitText.create(name, { type: 'chars', charsClass: 'char' });
     tl.from(split.chars, { yPercent: 105, duration: 1.5, stagger: 0.09 }, 0.35);
+    // Once the letters are up, "Mai" catches the same gold gleam as the logo.
+    tl.add(() => {
+      split.revert();
+      name.classList.add('is-gleaming');
+    }, '>');
   }
   tl.from('[data-intro]', { y: 26, autoAlpha: 0, duration: 1.3, stagger: 0.08 }, name ? 0.55 : 0.2);
   // Visit: the map panel rises in like the AusMC venue map.
@@ -181,13 +186,30 @@ function floatCards() {
   });
 }
 
+const LINE_REVEAL = '.h2[data-reveal], .band__line[data-reveal]';
+
 function reveals() {
   gsap.set('[data-reveal]', { y: 40, autoAlpha: 0 });
-  ScrollTrigger.batch('[data-reveal]', {
+  ScrollTrigger.batch(`[data-reveal]:not(${LINE_REVEAL})`, {
     start: 'top 90%',
     once: true,
     onEnter: (batch) =>
       gsap.to(batch, { y: 0, autoAlpha: 1, duration: 1.25, ease: 'expo.out', stagger: 0.09, overwrite: true }),
+  });
+
+  // Headings rise line by line through masks. Split at the moment they appear (so in
+  // whatever language is showing), and put back as plain text once they're up.
+  gsap.utils.toArray(LINE_REVEAL).forEach((heading) => {
+    ScrollTrigger.create({
+      trigger: heading,
+      start: 'top 90%',
+      once: true,
+      onEnter: () => {
+        const split = SplitText.create(heading, { type: 'lines', mask: 'lines' });
+        gsap.set(heading, { y: 0, autoAlpha: 1 });
+        gsap.from(split.lines, { yPercent: 115, rotate: 2, transformOrigin: '0% 100%', duration: 1.35, stagger: 0.12, ease: 'expo.out', onComplete: () => split.revert() });
+      },
+    });
   });
 
   gsap.utils.toArray('[data-reveal-photo]').forEach((el) => {
