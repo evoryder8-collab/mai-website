@@ -48,7 +48,7 @@ if (canvas) {
 }
 
 // Satin along the edges of her photos: also loaded once the browser is idle.
-if (document.querySelector('.float-card__frame, .frame, .band__media, .teaser__visual')) {
+if (document.querySelector('.float-card__frame, .frame, .band__media, .teaser__visual, .dog__medal')) {
   whenIdle(() => import('./satin-edges.js').then(({ initSatinEdges }) => initSatinEdges({ reduceMotion })).catch(() => {}));
 }
 

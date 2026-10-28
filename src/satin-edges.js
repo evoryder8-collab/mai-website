@@ -12,6 +12,7 @@ const PHOTOS = [
   ['.about__photo .frame, .treatment__photo .frame', [1, 1, 1, 1]],
   ['.band__media', [0, 0, 1, 1]],
   ['.teaser__visual', [0, 0, 1, 0]],
+  ['.dog__medal', [1, 1, 1, 1]],
 ];
 
 const VERT = `
@@ -276,7 +277,8 @@ function mount(el, edges, { reduceMotion }) {
     W = el.offsetWidth;
     H = el.offsetHeight;
     if (!W || !H) return;
-    const r = Math.min(parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0, W / 2, H / 2);
+    const radius = getComputedStyle(el).borderTopLeftRadius;
+    const r = Math.min((parseFloat(radius) || 0) * (radius.endsWith('%') ? Math.min(W, H) / 100 : 1), W / 2, H / 2);
     width = Math.max(10, Math.min(22, Math.min(W, H) * 0.05));
     const bleed = Math.ceil(width * 3.2 + 14);
     const inner = Math.min(Math.ceil(10 + 0.3 * r), Math.floor(Math.min(W, H) / 2));
