@@ -30,7 +30,6 @@ export function initMotion({ reduceMotion, deferIntro = false }) {
     introTimeline = intro();
     if (deferIntro) introTimeline.pause();
     floatCards();
-    immersiveFilm();
     reveals();
     parallax();
     fireGlow();
@@ -106,66 +105,6 @@ function intro() {
   const panel = document.querySelector('[data-map-panel]');
   if (panel) tl.from(panel, { y: 80, scale: 0.94, autoAlpha: 0, duration: 1.6, clearProps: 'transform' }, 0.25);
   return tl;
-}
-
-// Phones: scrolling onto the award film, it grows from its card to fill the whole
-// screen, holds while the ceremony plays, then lets go. (Browsers only allow true
-// fullscreen from a tap; the film's own button does that.)
-function immersiveFilm() {
-  const figure = document.querySelector('[data-film]');
-  const frame = figure?.querySelector('.video-frame');
-  if (!frame) return;
-  const backdrop = figure.querySelector('.film__backdrop');
-  const caption = figure.querySelector('figcaption');
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 760px)', () => {
-    gsap.from(figure, { y: 40, autoAlpha: 0, duration: 1.25, ease: 'expo.out', scrollTrigger: { trigger: figure, start: 'top 90%', once: true } });
-  });
-  mm.add('(max-width: 759px)', () => {
-    let immersed = false;
-    const announce = (on) => {
-      if (on === immersed) return;
-      immersed = on;
-      figure.classList.toggle('is-immersed', on);
-      document.dispatchEvent(new CustomEvent('mai:film', { detail: { immersive: on } }));
-    };
-    // The card's own size, from the CSS (min(100vw - 2 × gutter, 380px), 9:16).
-    const cardW = () => Math.min(innerWidth - 2 * parseFloat(getComputedStyle(document.querySelector('.container')).paddingLeft), 380);
-    // Holds the screen while the ceremony plays, then lets go.
-    ScrollTrigger.create({
-      trigger: figure,
-      start: 'top top',
-      end: '+=110%',
-      pin: true,
-      onEnterBack: () => announce(true),
-      onLeave: () => announce(false),
-    });
-    // From the moment it comes into view it grows, filling the screen exactly as it arrives.
-    gsap
-      .timeline({
-        scrollTrigger: {
-          trigger: figure,
-          start: 'top 95%',
-          end: 'top top',
-          scrub: 0.3,
-          invalidateOnRefresh: true,
-          // Pause once it's a quarter of the way in, and it glides the rest of the way to full screen.
-          snap: { snapTo: (v) => (v > 0.25 ? 1 : 0), delay: 0.12, duration: { min: 0.3, max: 0.8 }, ease: 'power2.inOut' },
-          onUpdate: (self) => announce(self.progress > 0.7),
-        },
-      })
-      .fromTo(
-        frame,
-        { width: cardW, height: () => (cardW() * 16) / 9, borderRadius: 30 },
-        { width: () => innerWidth, height: () => innerHeight, borderRadius: 0, ease: 'none' },
-      )
-      .fromTo(backdrop, { autoAlpha: 0 }, { autoAlpha: 1, ease: 'none' }, 0)
-      .to(caption, { autoAlpha: 0, duration: 0.4, ease: 'none' }, 0);
-    return () => {
-      announce(false);
-      gsap.set(frame, { clearProps: 'width,height,borderRadius' });
-    };
-  });
 }
 
 // Glass photo cards hang in 3D: a slow float, and on desktop a tilt toward the pointer

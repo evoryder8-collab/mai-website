@@ -12,7 +12,6 @@
  "intl-3rd-place": "3ᵉ place en compétitions internationales",
  "award-line-home": "La technique exceptionnelle et le toucher de Mai ont été récompensés par une 3ᵉ place en compétitions internationales, ainsi qu’un Prix spécial.",
  "the-award-the-ceremony-film": "La distinction &amp; le film de la cérémonie",
- "watch-the-award-ceremony": "Voir la cérémonie",
  "about-mai": "À propos de Mai",
  "warmth-that-unwinds": "Une chaleur qui dénoue.",
  "a-thai-governmentcertified-therapist-mai": "Thérapeute certifiée par le gouvernement thaïlandais, Mai est thérapeute en chef au Memories Spa, un salon réservé aux femmes à Tsukuba. Elle y dirige le Yu-fai, thérapie thermique aux plantes, et les soins les plus profondément relaxants.",
@@ -48,9 +47,6 @@
  "award-result": "3ᵉ place en compétitions internationales · Prix spécial",
  "discipline": "Discipline",
  "certified": "Certification",
- "watch-with-sound": "Regarder avec le son",
- "mute": "Couper le son",
- "award-ceremony-film": "Film de la cérémonie",
  "warmth-that-unwinds-2": "Une chaleur<br>qui dénoue.",
  "the-steady-warmth-of-her-2": "La chaleur sûre de ses paumes et sa technique fluide et enveloppante libèrent un corps raide de la tête aux pieds et guident en douceur le système nerveux vers son repos le plus profond.",
  "her-treatments": "Ses soins",
@@ -159,5 +155,11 @@
  "meta-treatments-title": "Soins · Mai, thérapeute en massage thaï",
  "meta-treatments-desc": "Le Yu-fai, thérapie thermique traditionnelle thaïe aux plantes, et le Nuat Thippaya, massage à travers une longue étoffe. Soins, formules et tarifs de Mai.",
  "meta-visit-title": "Venir · Mai au Memories Spa, Tsukuba",
- "meta-visit-desc": "Accès, horaires, paiement et réservation du Memories Spa, 68-17 Shibasaki, Tsukuba. Réservé aux femmes, sur réservation, petits chiens bienvenus."
+ "meta-visit-desc": "Accès, horaires, paiement et réservation du Memories Spa, 68-17 Shibasaki, Tsukuba. Réservé aux femmes, sur réservation, petits chiens bienvenus.",
+ "film-kicker": "Cérémonie MCWT 2025",
+ "film-title": "L’instant<br>de la distinction.",
+ "film-hint": "Faites défiler pour regarder",
+ "film-label": "Film",
+ "film-replay": "Revoir",
+ "film-sound-on": "Son activé"
 }

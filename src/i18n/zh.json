@@ -12,7 +12,6 @@
  "intl-3rd-place": "国际比赛第3名",
  "award-line-home": "Mai 以卓越的技术与极致的触感，在国际比赛中荣获第3名，并获特别奖。",
  "the-award-the-ceremony-film": "获奖与颁奖典礼影片",
- "watch-the-award-ceremony": "观看颁奖典礼影片",
  "about-mai": "关于 Mai",
  "warmth-that-unwinds": "以温暖，化解紧绷。",
  "a-thai-governmentcertified-therapist-mai": "Mai 是泰国政府认证理疗师，在筑波的女性专属沙龙 Memories Spa 担任首席理疗师，负责泰式草药热疗「Yu-fai」以及最深度放松的疗程。",
@@ -48,9 +47,6 @@
  "award-result": "国际比赛第3名 · 特别奖",
  "discipline": "项目",
  "certified": "资格",
- "watch-with-sound": "开声音观看",
- "mute": "静音",
- "award-ceremony-film": "颁奖典礼影片",
  "warmth-that-unwinds-2": "以温暖，<br>化解紧绷。",
  "the-steady-warmth-of-her-2": "掌心传来的踏实温暖，与包裹全身的流畅手法，让僵硬的身体彻底舒展，并温柔地将自律神经引入最深的休憩。",
  "her-treatments": "她的疗程",
@@ -159,5 +155,11 @@
  "meta-treatments-title": "疗程与价格｜Mai 泰式传统按摩理疗师",
  "meta-treatments-desc": "泰国传统草药热疗「Yu-fai」与长布按摩「Nuat Thippaya」。Mai 的疗程、套餐与价格。",
  "meta-visit-title": "交通｜Mai 泰式传统按摩理疗师｜Memories Spa 筑波",
- "meta-visit-desc": "Memories Spa（茨城县筑波市柴崎68-17）的交通、营业时间、支付与预约须知。女性专属、完全预约制，可携小型犬。"
+ "meta-visit-desc": "Memories Spa（茨城县筑波市柴崎68-17）的交通、营业时间、支付与预约须知。女性专属、完全预约制，可携小型犬。",
+ "film-kicker": "MCWT 2025 颁奖典礼",
+ "film-title": "获奖的<br>那一刻。",
+ "film-hint": "向下滚动观看",
+ "film-label": "影片",
+ "film-replay": "再看一次",
+ "film-sound-on": "声音已开"
 }

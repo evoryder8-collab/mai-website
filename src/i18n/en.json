@@ -12,7 +12,6 @@
  "intl-3rd-place": "3rd Place in International Competitions",
  "award-line-home": "Mai’s exceptional technique and touch were awarded 3rd place in international competitions, along with a Special Award.",
  "the-award-the-ceremony-film": "The award &amp; the ceremony film",
- "watch-the-award-ceremony": "Watch the award ceremony",
  "about-mai": "About Mai",
  "warmth-that-unwinds": "Warmth that unwinds.",
  "a-thai-governmentcertified-therapist-mai": "A Thai government–certified therapist, Mai is Therapist Chief at Memories Spa, a women-only salon in Tsukuba. She leads its Yu-fai herbal heat therapy and its most deeply relaxing treatments.",
@@ -48,9 +47,6 @@
  "award-result": "3rd place in international competitions · Special Award",
  "discipline": "Discipline",
  "certified": "Certified",
- "watch-with-sound": "Watch with sound",
- "mute": "Mute",
- "award-ceremony-film": "Award ceremony film",
  "warmth-that-unwinds-2": "Warmth<br>that unwinds.",
  "the-steady-warmth-of-her-2": "The steady warmth of her palms and her smooth, enveloping technique release a stiff body from head to toe, gently guiding the nervous system into its deepest rest.",
  "her-treatments": "Her treatments",
@@ -159,5 +155,11 @@
  "meta-treatments-title": "Treatments · Mai, Thai Massage Therapist",
  "meta-treatments-desc": "Yu-fai, Thailand’s traditional herbal heat therapy, and Nuat Thippaya, massage through a long cloth. Mai’s treatments, courses and prices.",
  "meta-visit-title": "Visit · Mai at Memories Spa, Tsukuba",
- "meta-visit-desc": "Directions, hours, payment and booking for Memories Spa, 68-17 Shibasaki, Tsukuba. Women only, by reservation, small dogs welcome."
+ "meta-visit-desc": "Directions, hours, payment and booking for Memories Spa, 68-17 Shibasaki, Tsukuba. Women only, by reservation, small dogs welcome.",
+ "film-kicker": "MCWT 2025 award ceremony",
+ "film-title": "The moment<br>she was awarded.",
+ "film-hint": "Scroll to watch",
+ "film-label": "Film",
+ "film-replay": "Watch again",
+ "film-sound-on": "Sound on"
 }

@@ -12,7 +12,6 @@
  "intl-3rd-place": "国際大会で3位入賞",
  "award-line-home": "卓越した技術と極上のタッチが認められ、国際大会で3位に入賞、特別賞も受賞しました。",
  "the-award-the-ceremony-film": "受賞と授賞式の映像",
- "watch-the-award-ceremony": "授賞式の映像を観る",
  "about-mai": "プロフィール",
  "warmth-that-unwinds": "温もりで、ほどく。",
  "a-thai-governmentcertified-therapist-mai": "タイ政府認定セラピストとして、つくばの女性専用サロン Memories Spa でセラピストチーフを務める Mai。タイに伝わるハーブ温熱療法「ユーファイ」と、極上の癒しの時間を担当しています。",
@@ -48,9 +47,6 @@
  "award-result": "国際大会3位入賞・特別賞",
  "discipline": "部門",
  "certified": "資格",
- "watch-with-sound": "音を出して観る",
- "mute": "ミュート",
- "award-ceremony-film": "授賞式の映像",
  "warmth-that-unwinds-2": "温もりで、<br>ほどく。",
  "the-steady-warmth-of-her-2": "手のひらから伝わる確かな温もりと、身体を包み込むようななめらかな手技は、硬直した全身をすっきりと解き放ち、自律神経を最高の休息状態へと優しく導きます。",
  "her-treatments": "施術について",
@@ -159,5 +155,11 @@
  "meta-treatments-title": "施術・コース｜Mai タイ伝統マッサージ セラピスト",
  "meta-treatments-desc": "タイ伝統のハーブ温熱療法「ユーファイ」と、布を使うマッサージ「ヌアット・ティップパヤー」。Mai が担当するタイ伝統ケアとコース・料金のご案内。",
  "meta-visit-title": "アクセス｜Mai タイ伝統マッサージ セラピスト｜Memories Spa つくば",
- "meta-visit-desc": "Memories Spa（茨城県つくば市柴崎68-17）へのアクセス、営業時間、お支払い、ご予約について。女性専用・完全予約制、小型犬同伴OK。"
+ "meta-visit-desc": "Memories Spa（茨城県つくば市柴崎68-17）へのアクセス、営業時間、お支払い、ご予約について。女性専用・完全予約制、小型犬同伴OK。",
+ "film-kicker": "MCWT 2025 授賞式",
+ "film-title": "受賞の、<br>その瞬間。",
+ "film-hint": "スクロールして観る",
+ "film-label": "映像",
+ "film-replay": "もう一度観る",
+ "film-sound-on": "音あり"
 }

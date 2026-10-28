@@ -1,0 +1,37 @@
+<!-- The award film: a glass card floating in 3D that straightens and grows to full screen
+     as you scroll, and plays while it fills it (src/film.js). -->
+<section class="film" id="film" aria-labelledby="film-title">
+  <div class="film__pin">
+    <div class="film__theater" aria-hidden="true"></div>
+    <div class="film__copy">
+      <p class="label"><span class="label__num">✦</span><span data-t="film-kicker">MCWT 2025 授賞式</span></p>
+      <h2 class="film__title" id="film-title" data-t="film-title">受賞の、<br>その瞬間。</h2>
+      <p class="film__hint"><span class="film__mouse" aria-hidden="true"><i></i></span><span data-t="film-hint">スクロールして観る</span></p>
+    </div>
+    <div class="film__frame">
+      <div class="film__floor" aria-hidden="true"></div>
+      <div class="film__bezel">
+        <video class="film__video" playsinline preload="none" poster="/media/award-ceremony-poster.jpg" width="720" height="1280" aria-label="Massage Championship World Tour 2025 award ceremony">
+          <source src="/media/award-ceremony.mp4" type="video/mp4">
+        </video>
+        <div class="film__shine" aria-hidden="true"></div>
+        <span class="film__tag"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg><span data-t="film-label">映像</span></span>
+        <div class="film__ui">
+          <button type="button" class="film__btn film__sound" aria-pressed="false">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="spk__w" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="spk__slash" d="m17 9 4 6M21 9l-4 6"/></svg>
+            <span class="film__sound-label" data-t="tap-for-sound">タップして音を出す</span>
+          </button>
+          <button type="button" class="film__btn film__full">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+            <span class="visually-hidden" data-t="full-screen">全画面</span>
+          </button>
+        </div>
+        <button type="button" class="film__replay" hidden>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+          <span data-t="film-replay">もう一度観る</span>
+        </button>
+        <span class="film__bar" aria-hidden="true"><i></i></span>
+      </div>
+    </div>
+  </div>
+</section>

@@ -31,6 +31,8 @@ const COPY = {
 };
 
 const ARROW = '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+// Tells the film (src/film.js), inside the same tap, that the visitor chose sound or silence.
+const soundGesture = () => document.dispatchEvent(new CustomEvent('mai:soundgesture', { detail: { on: sound.on } }));
 const flag = (code) => FLAGS[langInfo(code).flag];
 
 let resolveEntered;
@@ -89,8 +91,9 @@ export function initPortal({ lenis, reduceMotion, onEnter }) {
     stage.querySelector('.portal__yes').focus({ preventScroll: true });
     stage.querySelectorAll('[data-sound-choice]').forEach((b) =>
       b.addEventListener('click', () => {
-        // Within this tap, so the browser lets the audio start.
+        // Within this tap, so the browser lets the audio start (and the film unlock).
         sound.set(b.dataset.soundChoice === 'on');
+        soundGesture();
         if (sound.on) sound.chime();
         showLanguage(code);
       }),
@@ -246,7 +249,10 @@ export function initPortal({ lenis, reduceMotion, onEnter }) {
     label.dataset.t = on ? 'sound-off' : 'sound-on';
     label.textContent = t(label.dataset.t);
   };
-  speaker?.addEventListener('click', () => sound.set(!sound.on));
+  speaker?.addEventListener('click', () => {
+    sound.set(!sound.on);
+    soundGesture();
+  });
   sound.onChange(syncSpeaker);
   document.addEventListener('langchange', () => syncSpeaker(sound.on));
   syncSpeaker(sound.on);

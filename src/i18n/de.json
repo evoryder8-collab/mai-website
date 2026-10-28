@@ -12,7 +12,6 @@
  "intl-3rd-place": "3. Platz bei internationalen Wettbewerben",
  "award-line-home": "Mais herausragende Technik und Berührung wurden bei internationalen Wettbewerben mit dem 3. Platz und einem Sonderpreis ausgezeichnet.",
  "the-award-the-ceremony-film": "Die Auszeichnung &amp; der Film der Preisverleihung",
- "watch-the-award-ceremony": "Preisverleihung ansehen",
  "about-mai": "Über Mai",
  "warmth-that-unwinds": "Wärme, die löst.",
  "a-thai-governmentcertified-therapist-mai": "Mai ist von der thailändischen Regierung zertifizierte Therapeutin und leitende Therapeutin im Memories Spa, einem Salon nur für Frauen in Tsukuba. Dort verantwortet sie Yu-fai, die Kräuter-Wärmetherapie, und die tiefsten Entspannungsbehandlungen.",
@@ -48,9 +47,6 @@
  "award-result": "3. Platz bei internationalen Wettbewerben · Sonderpreis",
  "discipline": "Disziplin",
  "certified": "Zertifiziert",
- "watch-with-sound": "Mit Ton ansehen",
- "mute": "Stumm",
- "award-ceremony-film": "Film der Preisverleihung",
  "warmth-that-unwinds-2": "Wärme,<br>die löst.",
  "the-steady-warmth-of-her-2": "Die beständige Wärme ihrer Hände und ihre fließende, umhüllende Technik lösen einen verspannten Körper von Kopf bis Fuß und führen das vegetative Nervensystem sanft in die tiefste Ruhe.",
  "her-treatments": "Ihre Behandlungen",
@@ -159,5 +155,11 @@
  "meta-treatments-title": "Behandlungen · Mai, Thai-Massage-Therapeutin",
  "meta-treatments-desc": "Yu-fai, Thailands traditionelle Kräuter-Wärmetherapie, und Nuat Thippaya, Massage durch ein langes Tuch. Mais Behandlungen, Pakete und Preise.",
  "meta-visit-title": "Anfahrt · Mai im Memories Spa, Tsukuba",
- "meta-visit-desc": "Anfahrt, Öffnungszeiten, Zahlung und Buchung im Memories Spa, 68-17 Shibasaki, Tsukuba. Nur für Frauen, nur mit Termin, kleine Hunde willkommen."
+ "meta-visit-desc": "Anfahrt, Öffnungszeiten, Zahlung und Buchung im Memories Spa, 68-17 Shibasaki, Tsukuba. Nur für Frauen, nur mit Termin, kleine Hunde willkommen.",
+ "film-kicker": "Preisverleihung MCWT 2025",
+ "film-title": "Der Moment<br>der Auszeichnung.",
+ "film-hint": "Zum Ansehen scrollen",
+ "film-label": "Film",
+ "film-replay": "Noch einmal",
+ "film-sound-on": "Ton an"
 }

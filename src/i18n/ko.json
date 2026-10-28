@@ -12,7 +12,6 @@
  "intl-3rd-place": "국제대회 3위 입상",
  "award-line-home": "Mai는 뛰어난 기술과 최상의 터치를 인정받아 국제대회에서 3위에 입상하고 특별상도 수상했습니다.",
  "the-award-the-ceremony-film": "수상과 시상식 영상",
- "watch-the-award-ceremony": "시상식 영상 보기",
  "about-mai": "Mai 소개",
  "warmth-that-unwinds": "온기로, 풀어내다.",
  "a-thai-governmentcertified-therapist-mai": "태국 정부 공인 테라피스트 Mai는 쓰쿠바의 여성 전용 살롱 Memories Spa에서 수석 테라피스트를 맡고 있으며, 허브 온열 요법 ‘Yu-fai’와 가장 깊은 휴식의 시간을 담당합니다.",
@@ -48,9 +47,6 @@
  "award-result": "국제대회 3위 입상 · 특별상",
  "discipline": "부문",
  "certified": "자격",
- "watch-with-sound": "소리와 함께 보기",
- "mute": "음소거",
- "award-ceremony-film": "시상식 영상",
  "warmth-that-unwinds-2": "온기로,<br>풀어내다.",
  "the-steady-warmth-of-her-2": "손바닥에서 전해지는 깊은 온기와 온몸을 감싸는 부드러운 손길은 굳은 몸을 시원하게 풀어 주고, 자율신경을 가장 편안한 휴식 상태로 부드럽게 이끕니다.",
  "her-treatments": "Mai의 시술",
@@ -159,5 +155,11 @@
  "meta-treatments-title": "시술 · 코스｜Mai 태국 전통 마사지 테라피스트",
  "meta-treatments-desc": "태국 전통 허브 온열 요법 ‘Yu-fai’와 긴 천 마사지 ‘Nuat Thippaya’. Mai의 시술, 코스, 요금 안내.",
  "meta-visit-title": "오시는 길｜Mai 태국 전통 마사지 테라피스트｜Memories Spa 쓰쿠바",
- "meta-visit-desc": "Memories Spa(이바라키현 쓰쿠바시 시바사키 68-17) 오시는 길, 영업시간, 결제, 예약 안내. 여성 전용, 완전 예약제, 소형견 동반 가능."
+ "meta-visit-desc": "Memories Spa(이바라키현 쓰쿠바시 시바사키 68-17) 오시는 길, 영업시간, 결제, 예약 안내. 여성 전용, 완전 예약제, 소형견 동반 가능.",
+ "film-kicker": "MCWT 2025 시상식",
+ "film-title": "수상의<br>그 순간.",
+ "film-hint": "스크롤하여 보기",
+ "film-label": "영상",
+ "film-replay": "다시 보기",
+ "film-sound-on": "소리 켜짐"
 }

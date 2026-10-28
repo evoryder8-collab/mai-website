@@ -12,7 +12,6 @@
  "intl-3rd-place": "3° posto in competizioni internazionali",
  "award-line-home": "La tecnica eccezionale e il tocco di Mai sono stati premiati con il 3° posto in competizioni internazionali, insieme a un Premio speciale.",
  "the-award-the-ceremony-film": "Il premio &amp; il video della cerimonia",
- "watch-the-award-ceremony": "Guarda la premiazione",
  "about-mai": "Chi è Mai",
  "warmth-that-unwinds": "Un calore che scioglie.",
  "a-thai-governmentcertified-therapist-mai": "Terapista certificata dal governo thailandese, Mai è capo terapista al Memories Spa, un salone solo per donne a Tsukuba. Qui guida lo Yu-fai, terapia termica alle erbe, e i trattamenti più profondamente rilassanti.",
@@ -48,9 +47,6 @@
  "award-result": "3° posto in competizioni internazionali · Premio speciale",
  "discipline": "Disciplina",
  "certified": "Certificazione",
- "watch-with-sound": "Guarda con l’audio",
- "mute": "Disattiva audio",
- "award-ceremony-film": "Video della premiazione",
  "warmth-that-unwinds-2": "Un calore<br>che scioglie.",
  "the-steady-warmth-of-her-2": "Il calore costante dei suoi palmi e la sua tecnica fluida e avvolgente sciolgono un corpo rigido dalla testa ai piedi e accompagnano dolcemente il sistema nervoso nel riposo più profondo.",
  "her-treatments": "I suoi trattamenti",
@@ -159,5 +155,11 @@
  "meta-treatments-title": "Trattamenti · Mai, terapista di massaggio thai",
  "meta-treatments-desc": "Lo Yu-fai, terapia termica tradizionale thai alle erbe, e il Nuat Thippaya, massaggio attraverso un lungo telo. Trattamenti, percorsi e prezzi di Mai.",
  "meta-visit-title": "Come arrivare · Mai al Memories Spa, Tsukuba",
- "meta-visit-desc": "Come arrivare, orari, pagamento e prenotazione al Memories Spa, 68-17 Shibasaki, Tsukuba. Solo donne, su prenotazione, cani di piccola taglia benvenuti."
+ "meta-visit-desc": "Come arrivare, orari, pagamento e prenotazione al Memories Spa, 68-17 Shibasaki, Tsukuba. Solo donne, su prenotazione, cani di piccola taglia benvenuti.",
+ "film-kicker": "Premiazione MCWT 2025",
+ "film-title": "Il momento<br>del premio.",
+ "film-hint": "Scorri per guardare",
+ "film-label": "Video",
+ "film-replay": "Guarda di nuovo",
+ "film-sound-on": "Audio attivo"
 }

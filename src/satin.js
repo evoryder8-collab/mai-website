@@ -75,10 +75,11 @@ void main() {
   // Noise warped twice through itself, then the folds: bands whose phase it bends.
   float t = uTime * 0.035;
   float stir = 1.1 + min(abs(uVel), 1.0) * 0.5;
-  vec2 w1 = vec2(snoise(q * 0.62 + vec2(t, -t * 0.6)), snoise(q * 0.62 + vec2(-t * 0.7, t) + 4.3));
-  vec2 w2 = vec2(snoise(q * 0.95 + w1 * stir + vec2(1.7, 9.2) + t), snoise(q * 0.95 + w1 * stir + vec2(8.3, 2.8) - t));
-  float n = snoise(q * 0.55 + w2 * 0.7 + vec2(0.0, uScroll * 0.12));
-  float folds = 0.5 + 0.5 * sin((q.x * 1.2 + q.y * 0.8 + n * 1.5 + w1.x * 0.5) * 2.4 + t * 4.0);
+  vec2 w1 = vec2(snoise(q * 0.42 + vec2(t, -t * 0.6)), snoise(q * 0.42 + vec2(-t * 0.7, t) + 4.3));
+  vec2 w2 = vec2(snoise(q * 0.66 + w1 * stir + vec2(1.7, 9.2) + t), snoise(q * 0.66 + w1 * stir + vec2(8.3, 2.8) - t));
+  float n = snoise(q * 0.38 + w2 * 0.7 + vec2(0.0, uScroll * 0.12));
+  // Few, broad folds: about one and a half across the screen.
+  float folds = 0.5 + 0.5 * sin((q.x * 1.2 + q.y * 0.8 + n * 1.5 + w1.x * 0.5) * 1.15 + t * 4.0);
 
   vec3 sand = vec3(0.855, 0.79, 0.695);
   vec3 linen = vec3(0.945, 0.915, 0.865);
