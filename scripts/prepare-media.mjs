@@ -61,7 +61,7 @@ if (run('logo')) {
 }
 
 // Two chihuahua barks for the moment Latte and Mugi land (dogs.js): from the first bark,
-// three seconds, levelled to the same loudness and fading out smoothly to the end.
+// 2.4 seconds, levelled to the same loudness and fading out smoothly to the end.
 const BARKS = {
   'bark-playful.wav': ['bark-latte', 0.14],
   'bark-small.wav': ['bark-mugi', 0],
@@ -70,7 +70,7 @@ if (run('barks')) {
   await mkdir('src/assets', { recursive: true });
   for (const [file, [name, start]] of Object.entries(BARKS)) {
     execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', `${SRC}/${file}`, '-map_metadata', '-1',
-      '-af', `atrim=start=${start}:duration=3,asetpts=PTS-STARTPTS,loudnorm=I=-19:TP=-2:LRA=11,afade=t=in:d=0.01,afade=t=out:st=1.8:d=1.2`,
+      '-af', `atrim=start=${start}:duration=2.4,asetpts=PTS-STARTPTS,loudnorm=I=-19:TP=-2:LRA=11,afade=t=in:d=0.01,afade=t=out:st=1.5:d=0.9`,
       '-ac', '1', '-ar', '44100', '-c:a', 'libmp3lame', '-b:a', '96k', `src/assets/${name}.mp3`], { stdio: 'inherit' });
     console.log(`sound  ${file} -> src/assets/${name}.mp3`);
   }
@@ -83,7 +83,7 @@ if (run('barks')) {
 // headroom for the MP3's overshoot); sound.js sets how loud each one plays.
 const SFX = {
   tap: ['219162', 0, 0.3, 0.12], // Jagadamba, "FrogBlock05": a soft wooden tok
-  hover: ['394795', 0.045, 0.7, 0.4], // LanooskiProductions, "Ding": a small glass ting
+  hover: ['536550', 0.004, 1.1, 0.7], // dvdfu, "Kalimba C2": one soft kalimba note, C5
   chime: ['398496', 0, 3.2, 1.6], // Anthousai, "wind chimes - single 04": one chime
   tick: ['534094', 0.025, 0.3, 0.12], // pbimal, "clock-tick-01": one clock tick
   bowl: ['411481', 0.035, 8, 3], // s-light, "singing bowl - single strike 4"

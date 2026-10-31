@@ -43,7 +43,7 @@ ids; `npm run media -- sfx` cuts and levels them.
 | Effect | Used for | Recording |
 | --- | --- | --- |
 | `sfx-tap` | touching buttons and links | [FrogBlock05](https://freesound.org/people/Jagadamba/sounds/219162/) by Jagadamba |
-| `sfx-hover` | the pointer finding one (desktop) | [Ding](https://freesound.org/people/LanooskiProductions/sounds/394795/) by LanooskiProductions |
+| `sfx-hover` | the pointer finding one (desktop), as a note of A-minor pentatonic | [Kalimba C2](https://freesound.org/people/dvdfu/sounds/536550/) by dvdfu |
 | `sfx-chime` | a choice made (portal, directions) | [wind chimes - single 04](https://freesound.org/people/Anthousai/sounds/398496/) by Anthousai |
 | `sfx-tick` | the portal's language countdown | [clock-tick-01](https://freesound.org/people/pbimal/sounds/534094/) by pbimal |
 | `sfx-bowl` | her line in the portal, the map arriving | [singing bowl - single strike 4](https://freesound.org/people/s-light/sounds/411481/) by s-light |

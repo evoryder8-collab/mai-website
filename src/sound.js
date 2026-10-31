@@ -25,13 +25,16 @@ const MUSIC_AT = 'mai-music-at';
 // below it, a tap about 10, the countdown tick and the hover ting quieter still.
 const SFX = {
   tap: [tapUrl, 0.3],
-  hover: [hoverUrl, 0.055],
+  hover: [hoverUrl, 0.015],
   chime: [chimeUrl, 0.36],
   tick: [tickUrl, 0.06],
   bowl: [bowlUrl, 0.19],
   swish: [swishUrl, 0.35],
   flight: [flightUrl, 0.1],
 };
+// Her music sits in A minor, so the hover note (a kalimba C5) plays as one of its pentatonic
+// notes, G A C D E, and always sounds at home over it.
+const HOVER_NOTES = [-5, -3, 0, 2, 4].map((semitones) => 2 ** (semitones / 12));
 
 let enabled = (() => {
   try {
@@ -48,6 +51,7 @@ let music = null;
 let startingOver = false;
 let ducked = false;
 let lastHover = 0;
+let lastNote = 0;
 let analyser = null;
 let meter = null;
 const listeners = new Set();
@@ -217,11 +221,12 @@ export const sound = {
     effect('tap', { rate: 0.96 + Math.random() * 0.08 });
   },
 
-  /** A faint glass ting when the pointer finds something (desktop). */
+  /** A soft kalimba note when the pointer finds something (desktop), never the same twice running. */
   hover() {
     if (performance.now() - lastHover < 90) return;
     lastHover = performance.now();
-    effect('hover', { rate: 0.94 + Math.random() * 0.14, pan: (Math.random() - 0.5) * 0.5 });
+    lastNote = (lastNote + 1 + Math.floor(Math.random() * (HOVER_NOTES.length - 1))) % HOVER_NOTES.length;
+    effect('hover', { rate: HOVER_NOTES[lastNote], pan: (Math.random() - 0.5) * 0.5 });
   },
 
   /** A small bell: a choice made. */
